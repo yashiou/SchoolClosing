@@ -1,0 +1,4 @@
+repository "畢業專題@DCD_SchoolShoot@cloud"
+  path "/"
+    br "/main"
+    co "/main"
