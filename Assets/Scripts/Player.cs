@@ -4,14 +4,15 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    public int will;  // 意志值
-    public int sanity;  // SAN值
-
+    public int will = 3;  //意志值
+    public int currentSanity = 100;  //當前SAN值
+    public int maxSanity = 100; //最大SAN值
+    
     // Start is called before the first frame update
     void Start()
     {
-        will = 100;
-        sanity = 100;
+        will = 3;
+        currentSanity = 100;
     }
 
     // Update is called once per frame
@@ -20,20 +21,35 @@ public class Player : MonoBehaviour
         
     }
 
-    // 减少意志值
-    public void DecreaseWill(int amount)
+    public void TakeDamage(int damage)
     {
-        will -= amount;
-        if (will <= 0)
+        currentSanity -= damage;
+        
+        if (currentSanity <= 0)
         {
-            Debug.Log("玩家意志崩溃！");
+            will--; // 減少意志值
+
+            if (will > 0)
+            {
+                currentSanity = maxSanity; // 重置條血
+                Debug.Log("One health bar destroyed. Remaining Willpower: " + will);
+            }
+            else
+            {
+                Debug.Log("Player defeated."); //gameover
+            }
+        }
+        else
+        {
+            Debug.Log("Player took damage. Current Health: " + currentSanity);
         }
     }
+
 
     // 恢復SAN值
     public void RestoreSanity(int amount)
     {
-        sanity += amount;
-        if (sanity > 100) sanity = 100;  // 防止超出最大值
+        currentSanity += amount;
+        if (currentSanity > 100) currentSanity = 100;  // 防止超出最大值
     }
 }
