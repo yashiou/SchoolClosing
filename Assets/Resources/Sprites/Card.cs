@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 public class Card : MonoBehaviour
 {
-    [SerializeField]//保護
+    [SerializeField]//<---保護程式碼用
     public GameObject Card_prefab;
     
     public SenceSystem senceSystem;
@@ -21,11 +21,14 @@ public class Card : MonoBehaviour
     
     [SerializeField]
     public Text Card_Hint;
+    
+    [SerializeField]
+    public GameObject ShowCardBig; //放大卡牌
 
     void Start()
     {
 
-        senceSystem = FindObjectOfType<SenceSystem>();
+        senceSystem = FindObjectOfType<SenceSystem>(); //從倉庫抓數據過來
 
         for (int i = 0; i < 21; i++)
         {
@@ -35,6 +38,10 @@ public class Card : MonoBehaviour
             Card.name = i.ToString();
             
             Card.SetActive(true);
+            
+            Showcard showcard = Card.AddComponent<Showcard>();//放大牌
+
+            showcard.ShowBigImage = ShowCardBig;//放大牌
 
             Button Card_button = Card.GetComponent<Button>();
             
@@ -44,8 +51,20 @@ public class Card : MonoBehaviour
         
         
     }
+    
+     //放大卡牌
 
-    public void OpenBackPack()
+    public void DeleetCard(string id,GameObject CardObject) //刪除卡牌
+    {
+        if (senceSystem.CardBackpack.Contains(id))
+        {
+            Destroy(CardObject);
+            
+            senceSystem.CardBackpack.Remove(id); //刪除卡牌id
+        }
+    }
+
+    public void OpenBackPack()//背包
     {
         for (int i = 0; i < ClearList.Count; i++)
         {
@@ -63,18 +82,23 @@ public class Card : MonoBehaviour
             Button Card_button = Card.GetComponent<Button>();
             
             ClearList.Add(Card);
+
+            Showcard showcard = Card.AddComponent<Showcard>();
+
+            showcard.ShowBigImage = ShowCardBig;
             
-            
+            Card_button.onClick.AddListener(() => DeleetCard(Card.name, Card));
+
             
         }
         CardBackpack.transform.parent.gameObject.SetActive(true);
     }
 
-    public void ToBattle()
+    public void ToBattle()//卡牌不夠時顯示
     {
-        if (senceSystem.CardBackpack.Count < 14)
+        if (senceSystem.CardBackpack.Count < 21)
         {
-            ShowHint("牌數不夠14張");
+            ShowHint("牌數不夠21張!!!");
         }
         else
         {
@@ -83,7 +107,7 @@ public class Card : MonoBehaviour
         
     }
 
-    public async void ShowHint(string text)
+    public async void ShowHint(string text)//卡牌不夠時顯示(顯示的字效果)
     {
         Card_Hint.gameObject.SetActive(true);
 
@@ -101,7 +125,7 @@ public class Card : MonoBehaviour
         {
             if (id == s )
             {
-                cardLimit++; //
+                cardLimit++;
             }
 
             if (cardLimit == 3)
