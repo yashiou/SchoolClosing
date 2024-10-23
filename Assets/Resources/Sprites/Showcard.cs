@@ -1,18 +1,28 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Threading.Tasks;
-using Microsoft.Unity.VisualStudio.Editor;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class Showcard : MonoBehaviour , IPointerEnterHandler ,IPointerExitHandler
 {
     public GameObject ShowBigImage;
 
     public ShowCardIamg ShowCardiamg;
+
+    public Card card;
+
     void Start()
     {
         ShowCardiamg = ShowBigImage.GetComponent<ShowCardIamg>();
+        
+        gameObject.GetComponent<Button>().onClick.AddListener(() => StopCoroutine("CardDelayScale"));
+        
+        gameObject.GetComponent<Button>().onClick.AddListener(() => ShowBigImage.SetActive(false));
+        
+        
     }
     
     void Update()
@@ -36,8 +46,16 @@ public class Showcard : MonoBehaviour , IPointerEnterHandler ,IPointerExitHandle
     private IEnumerator CardDelayScale()
     {
         yield return new WaitForSeconds(1);
+
+        ShowBigImage.GetComponent<Image>().sprite = gameObject.GetComponent<Image>().sprite;//等圖片
+
+        Button BigImageButton = ShowBigImage.GetComponent<Button>();
         
-        //ShowBigImage.GetComponent<Image>().sprite = //等圖片
+        BigImageButton.onClick.RemoveAllListeners();//清除按鈕綁定事件
+        
+        BigImageButton.onClick.AddListener(()=> card.CardEvent(name));//綁定新按鈕事件
+
+        BigImageButton.onClick.AddListener(()=> ShowBigImage.SetActive(false)); //關閉大圖
         
         ShowBigImage.SetActive(true);
 

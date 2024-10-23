@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 using System.Threading.Tasks;
+using Random = UnityEngine.Random;
 
 public class Card : MonoBehaviour
 {
@@ -25,23 +26,38 @@ public class Card : MonoBehaviour
     [SerializeField]
     public GameObject ShowCardBig; //放大卡牌
 
+    [SerializeField] 
+    private bool Tester;//測試者模式
+    
     void Start()
     {
 
         senceSystem = FindObjectOfType<SenceSystem>(); //從倉庫抓數據過來
 
+        if (Tester)
+        {
+            for (int i = 0; i < 21; i++)
+            {
+                senceSystem.CardBackpack.Add(Random.Range(0, 21).ToString());
+            }
+        }
+
         for (int i = 0; i < 21; i++)
         {
             
-            GameObject Card = Instantiate(Card_prefab, Card_prefab.transform.parent);
+            GameObject Card = Instantiate(Card_prefab, Card_prefab.transform.parent);//生成
 
             Card.name = i.ToString();
+            
+            senceSystem.BidingImageToObject(Card,i); //綁定id與圖片
             
             Card.SetActive(true);
             
             Showcard showcard = Card.AddComponent<Showcard>();//放大牌
 
-            showcard.ShowBigImage = ShowCardBig;//放大牌
+            showcard.ShowBigImage = ShowCardBig;//放大牌綁定
+
+            showcard.card = this;
 
             Button Card_button = Card.GetComponent<Button>();
             
@@ -51,8 +67,6 @@ public class Card : MonoBehaviour
         
         
     }
-    
-     //放大卡牌
 
     public void DeleetCard(string id,GameObject CardObject) //刪除卡牌
     {
@@ -77,16 +91,14 @@ public class Card : MonoBehaviour
 
             Card.name = senceSystem.CardBackpack[i];
             
+            senceSystem.BidingImageToObject(Card, int.Parse(senceSystem.CardBackpack[i]));
+            
             Card.SetActive(true);
 
             Button Card_button = Card.GetComponent<Button>();
             
             ClearList.Add(Card);
 
-            Showcard showcard = Card.AddComponent<Showcard>();
-
-            showcard.ShowBigImage = ShowCardBig;
-            
             Card_button.onClick.AddListener(() => DeleetCard(Card.name, Card));
 
             
@@ -121,6 +133,14 @@ public class Card : MonoBehaviour
     public void CardEvent(string id)
     {
         int cardLimit = 0;
+        if (senceSystem.CardBackpack.Count >= 21)
+        {
+            ShowHint("牌數已達21張!");
+                
+            return;
+            
+        }
+        
         foreach (string s in senceSystem.CardBackpack) //檢查每張卡ID
         {
             if (id == s )
