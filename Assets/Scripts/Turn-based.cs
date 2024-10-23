@@ -23,29 +23,43 @@ public class Turn_based : MonoBehaviour
     //玩家回合
     void StartPlayerTurn()
     {
-        Debug.Log("玩家的回合开始！");
+        Debug.Log("玩家的回合開始！");
         isPlayerTurn = true;
+        deckManager.DrawCard();
+    }
+
+     public void DiscardAndEndTurn(Card card)
+    {
+        deckManager.DiscardCard(card);  // 丢弃指定手牌
+        EndPlayerTurn();
     }
 
     //结束玩家回合
     public void EndPlayerTurn()
     {
         isPlayerTurn = false;
+    
         StartEnemyTurn();
     }
 
-    //敌人回合
+    //敵人回合
     void StartEnemyTurn()
     {
-        Debug.Log("敌人的回合开始！");
-        enemy.IncreaseGrudge(10);  //敌人增加怨恨值
+        Debug.Log("敵人的回合開始！");
         EndEnemyTurn();
     }
 
-    //结束敌人回合
+     // 敌人攻击玩家的逻辑
+    void AttackPlayer()
+    {
+        Debug.Log("敌人正在攻击玩家！");
+        player.LoseWill();  // 玩家损失一条血条
+    }
+
+    //结束敵人回合
     void EndEnemyTurn()
     {
-        Debug.Log("敌人的回合结束！");
+        Debug.Log("敵人的回合结束！");
         StartPlayerTurn();
     }
 }
