@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Threading.Tasks;
@@ -27,6 +28,29 @@ public class BattleMgr : MonoBehaviour
     public Text result; //文字綁定
 
     private bool OnJudge = false; //審判中
+    
+    [SerializeField]
+    public Slider BoossAnger, BoossHealth, PlayerHealth; //Booss生命 Booss血量 玩家生命條
+
+    private string DeffCardId = "8"; //替換牌用 紀錄格檔卡牌ID
+
+    [SerializeField] public GameObject PlayrEffectBar, BoossEffectBer; //玩家效果 敵人效果
+
+    [SerializeField] public List<GameObject> AllEffect = new List<GameObject>(); //所有效果
+
+    //堅定效果 迴避效果 反擊 預測牌 稟告 自我打氣 自我保護
+    private Dictionary<string, int> EffectAndCount = new Dictionary<string, int>()
+    {
+        { "isFirm",0 },
+        { "avoid",0},
+        { "counterattack",0},
+        {"KnowBossCard",0 },
+        { " report",0},
+        { "cheer",0},
+        { "protect",0}
+    };
+
+
     void Start()
     {
         senceSystem = FindObjectOfType<SenceSystem>();
@@ -36,12 +60,17 @@ public class BattleMgr : MonoBehaviour
         }
     }
 
-    public void GetCard()
+    public void GetCard(string TargetId = "", string repleseCardId = "")
     {
         if (senceSystem.CardBackpack.Count > 0)
         {
             int GetRandTarger = Random.Range(0, senceSystem.CardBackpack.Count); //得到卡牌索引
 
+            if (TargetId!= "")
+            {
+                GetRandTarger = senceSystem.CardBackpack.IndexOf(TargetId); //改成指定卡牌用
+            }
+            
             GameObject NowCard = Instantiate(Card_deck, Card_deck.transform.parent); //生成卡片
             
             senceSystem.BidingImageToObject(NowCard, int.Parse(senceSystem.CardBackpack[GetRandTarger]));
@@ -50,18 +79,11 @@ public class BattleMgr : MonoBehaviour
 
             Button CardButton = NowCard.GetComponent<Button>(); //每張卡牌上的按鈕
 
-            CardButton.onClick.AddListener(()=>UseCard(NowCard, NowCard.name)); //將按鈕綁定事件
+            CardButton.onClick.AddListener(()=>UseCard(NowCard, NowCard.name, repleseCardId)); //將按鈕綁定事件
             
             NowCard.SetActive(true); //啟用卡牌
             
             HandCardId.Add(senceSystem.CardBackpack[GetRandTarger]); //加入列表
-            
-            UsedCard.Add(senceSystem.CardBackpack[GetRandTarger]); //加入棄牌堆
-
-            senceSystem.CardBackpack.Remove(senceSystem.CardBackpack[GetRandTarger]); //移除指定的卡
-
-            CardStack.transform.GetChild(0).GetComponent<Text>().text = senceSystem.CardBackpack.Count.ToString(); //卡牌數
-            
         }
 
         if (HandCardId.Count == 0) //手上沒牌
@@ -87,11 +109,9 @@ public class BattleMgr : MonoBehaviour
             GetCard();
         }
     }
-    public void UseCard(GameObject gameObject,string id)
+    public void UseCard(GameObject gameObject,string id, string replaceCardId)
     {
-        
-        
-        if (OnJudge)
+        if (OnJudge)//審判中
             return;
 
         Destroy(gameObject); //消失指定牌
@@ -103,16 +123,54 @@ public class BattleMgr : MonoBehaviour
         PlayrCard.GetComponent<Image>().sprite = senceSystem.AllCardIame[PlayrCardId]; // 設定圖片
         
         PlayrCard.SetActive(true);
-        
-        BossChooseCard(); //對手丟牌
+
+        if (EffectAndCount["protect"] > 2)
+        {
+        }
+        else
+        {
+            BossChooseCard(); //對手丟牌
+
+        }
         
         judgeSystem(id);
+        
+        
+        if (replaceCardId !="")
+        {
+            UsedCard.Add(replaceCardId); //加入棄牌堆
+        }
+        else
+        {
+            UsedCard.Add(id); //加入棄牌堆
+        }
+        senceSystem.CardBackpack.Remove(id); //移除指定的卡
+        CardStack.transform.GetChild(0).GetComponent<Text>().text = senceSystem.CardBackpack.Count.ToString(); //卡牌數
     }
+
+    public void GetEffect(GameObject who, string Effect) //效果賦予
+    {
+        //將指定效果給予指定的人
+        GameObject useEffect = Instantiate(AllEffect.Find(x => x.name == Effect), who.transform);
+
+        EffectAndCount[Effect] = 2 ;
+        
+        useEffect.name = Effect;
+
+        useEffect.SetActive(true);
+    }
+
+    public void UseEffect(bool Open, string terEffect = "")//使用後移除效果 如果是移除要指定
+    {
+        Destroy(PlayrEffectBar.transform.Find(terEffect).gameObject); //一除指定效果 
+    }
+
     public async void judgeSystem(string id)
     {
         OnJudge = true;
         
         int WinOrLose = 2; //1是勝利2是平手0是敗
+
          
         if (PlayrCardId <= 6) //0~6勸導
         {
@@ -156,7 +214,7 @@ public class BattleMgr : MonoBehaviour
 
             }
         }
-        else if (PlayrCardId >=15) //14~20激勵
+        else if (PlayrCardId >=14) //14~20激勵
         {
             if (EnemyCardId <= 6) //0~6防禦
             {
@@ -179,21 +237,151 @@ public class BattleMgr : MonoBehaviour
 
             }
         }
+
+        UseEffect(true);//處發效果
+        
+        if(WinOrLose ==0 && EffectAndCount["protect"] > 0) //當具有自我保護效果時輸掉時 改成平手
+        {
+            result.text = "觸發自我保護 平手";
+
+            WinOrLose = 0;
+        }
+
+        if (WinOrLose == 0 && EffectAndCount["isFirm"] > 0) //當具有堅定效果時輸掉時 扭轉成贏的
+        {
+            result.text = "觸發小雨傘 勝";
+
+            WinOrLose = 1;
+        }
+
+        if(WinOrLose == 1 && PlayrCardId <14 && EffectAndCount["report"] > 0)
+        {
+            result.text = "觸發稟告 勝";
+
+            if (BoossAnger.value <=0)
+            {
+                BoossHealth.value -= 20;
+            }
+
+        }
+
+        if (WinOrLose == 1 && PlayrCardId >= 14 && EffectAndCount["cheer"] > 0)
+        {
+            result.text = "觸發自我打氣效果 勝";
+
+            if (BoossAnger.value <=0)
+            {
+                BoossHealth.value -= 20;
+            }
+        }
         
         result.gameObject.SetActive(true);
 
         await Task.Delay(2000);//等待兩秒
         
         result.gameObject.SetActive(false);
-
         
-        if (WinOrLose == 1)
+        if (WinOrLose == 1) //成功時
+        {
+            switch (id)
+            {
+                case "0": //唯一的的方法
+                    BoossAnger.value -= 10; 
+                    break;
+                case "1"://心理疏導
+                    BoossAnger.value -= 50; 
+                    break;
+                case "2"://嘴砲 
+                    BoossAnger.value -= 25;
+                    break;
+                case "3"://反擊譏諷
+                    BoossAnger.value -= 100;
+                    break;
+                case "4"://心理弱點
+                    BoossAnger.value -= 50;
+                    break;
+                case "5"://撕破偽裝
+                    BoossAnger.value -= 25;
+
+                    PlayerHealth.value += 20;
+                    break;
+                case "6"://堅持
+                    BoossAnger.value -= 50;
+
+                    PlayerHealth.value -= 10;
+                    break;
+                case "7"://格檔
+                    break;
+                case "8"://替換
+                    if (HandCardId.Count > 0)
+                    {
+                        int RandChangeCard = Random.Range(0, HandCardId.Count);
+                        {
+                            //刪掉指定的物體
+                            Destroy(Card_deck.transform.parent.GetChild(RandChangeCard + 1).gameObject);
+
+                            //將格檔牌加入手牌堆 -> 換成格檔牌 並紀錄替換原ID
+                            GetCard(DeffCardId, HandCardId[RandChangeCard]);
+
+                            HandCardId.RemoveAt(RandChangeCard); //刪除手牌堆id                           
+                        }
+                    }
+                    break;
+                case "9": //小雨傘
+                    GetEffect(PlayrEffectBar,"firm"); //給予玩家堅定效果
+
+                    break;
+                case "10":
+                    break;
+                case "11":
+                    break;
+                case "12": //危機意識
+                    EffectAndCount["KnowBossCard"] = 2;
+
+                    BossChooseCard(); //提前讓敵人打牌
+                    break;
+                case "13": //蜷縮
+                    PlayerHealth.value += 5;
+                    break;
+                case "14": //振奮
+                    if(BoossAnger.value <= 0)
+                        BoossHealth.value -= 10;
+                    break;
+                case "15"://自我信任
+                    if (BoossAnger.value <= 0)
+                        BoossHealth.value -= 15;
+                    break;
+                case "16"://稟告
+                    GetEffect(PlayrEffectBar,"report"); //給予玩家稟告效果
+                    break;
+                case "17":
+                    GetEffect(PlayrEffectBar, "cheer"); //給予玩家自我打氣效果
+                    break;
+                case "18":
+                    GetEffect(PlayrEffectBar, "protect"); //給予Boss自我保護負面效果
+                    break;
+                case "19": //反抗
+                    if (BoossAnger.value <= 0)
+                        BoossHealth.value -= 10;
+                    break;
+                case "20"://箝制
+                    if (BoossAnger.value <= 0)
+                        BoossHealth.value -= 15;
+                    break;
+                default:
+                    break;
+            }
+            
+        }
+        else if (WinOrLose == 0)//失敗時
         {
             switch (id)
             {
                 case "0" :
+                    BoossAnger.value -= 75; //失敗時減少75怨恨
                     break;
                 case "1" :
+                    
                     break;
                 case "2":
                     break;
@@ -211,11 +399,13 @@ public class BattleMgr : MonoBehaviour
                     break;
                 case "9" :
                     break;
-                case "10":
+                case "10": //小雨傘
+                    EffectAndCount["avoid"] = 2; //打開迴避效果
                     break;
-                case "11" :
+                case "11" : //應激
+                    EffectAndCount["counterattack"] = 2; //打開反擊效果
                     break;
-                case "12":
+                case "12": 
                     break;
                 case "13" :
                     break;
@@ -236,22 +426,54 @@ public class BattleMgr : MonoBehaviour
                 default: 
                     break;
             }
+            if (EffectAndCount["avoid"] > 0)
+            {
+                result.text = "觸發迴避效果";
+                
+                result.gameObject.SetActive(true);
+
+                await Task.Delay(1000);//等待兩秒
+        
+                result.gameObject.SetActive(false);
+            }
+            else if (EffectAndCount["counterattack"] > 0)
+            {
+                result.text = "觸發反擊效果";
+                
+                result.gameObject.SetActive(true);
+
+                BoossAnger.value -= 5;
+                
+                await Task.Delay(1000);//等待兩秒
+        
+                result.gameObject.SetActive(false);
+            }
+                else
+            {
+                if (EnemyCardId <= 6) //0~6防禦
+                {
+                
+                }
+                else if(7 <= EnemyCardId && EnemyCardId <= 14) //7~13傷害
+                {
+                
+                }
+                else if (EnemyCardId >=15)//14~20驚嚇
+                {
+                
+                }
+            }
             
         }
-        else if (WinOrLose == 0)
+        else if (WinOrLose == 2)
         {
-            if (EnemyCardId <= 6) //0~6防禦
+            if (id == "20")
             {
-                
-            }
-            else if(7 <= EnemyCardId && EnemyCardId <= 14) //7~13傷害
-            {
-                
-            }
-            else if (EnemyCardId >=15)//14~20驚嚇
-            {
-                
-            }
+                if (BoossAnger.value <= 0)
+                {
+                    BoossHealth.value -= 20;
+                }
+            }   
         }
         PlayrCard.SetActive(false);
         
@@ -265,8 +487,16 @@ public class BattleMgr : MonoBehaviour
                 break;
             }
         }
+        
+        foreach(KeyValuePair<string,int> keyValuePair in EffectAndCount) //瀏覽所有效果
+        {
+            if(keyValuePair.Value > 0) //減所有效果1回合
+            {
+                EffectAndCount[keyValuePair.Key] -= 1;
+            }
+        }
+        
         OnJudge = false; //結束審判
-
     }
 
     public void BossChooseCard()
@@ -277,11 +507,6 @@ public class BattleMgr : MonoBehaviour
         
         EnemyCard.SetActive(true);
 
-    }
-
-    public void SetShowCard(Image samll_image) //設定顯示用大卡牌
-    {
-        
     }
     void Update()
     {
