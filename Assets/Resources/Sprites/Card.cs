@@ -29,8 +29,8 @@ public class Card : MonoBehaviour
     [SerializeField] 
     private bool Tester;//測試者模式
 
-    [SerializeField] 
-    private int testcard = 0;//要測試號碼
+    /*[SerializeField] 
+    private int testcard = 0;*/ //要測試號碼
 
 
 
@@ -39,22 +39,22 @@ public class Card : MonoBehaviour
         
         senceSystem = FindObjectOfType<SenceSystem>(); //從倉庫抓數據過來
 
-        if (Tester)
+        /*if (Tester)
         {
             for (int i = 0; i < 21; i++)
             {
                 senceSystem.CardBackpack.Add(testcard.ToString());
             }
-        }
+        }*/
 
-        for (int i = 0; i < 21; i++)
+        for (int i = 0; i < senceSystem.AllCardIame.Count; i++)
         {
             
             GameObject Card = Instantiate(Card_prefab, Card_prefab.transform.parent);//生成
 
-            Card.name = i.ToString();
+            Card.name = senceSystem.AllCardIame[i].name;
             
-            senceSystem.BidingImageToObject(Card,i); //綁定id與圖片
+            senceSystem.BidingImageToObject(Card, Card.name); //綁定id與圖片
             
             Card.SetActive(true);
             
@@ -95,7 +95,7 @@ public class Card : MonoBehaviour
 
             Card.name = senceSystem.CardBackpack[i];
             
-            senceSystem.BidingImageToObject(Card, int.Parse(senceSystem.CardBackpack[i]));
+            senceSystem.BidingImageToObject(Card, senceSystem.CardBackpack[i]);
             
             Card.SetActive(true);
 

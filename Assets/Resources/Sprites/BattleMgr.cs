@@ -21,7 +21,7 @@ public class BattleMgr : MonoBehaviour
     [SerializeField] 
     public GameObject ShowCard, PlayrCard, EnemyCard, CardStack; //顯示手牌卡牌 卡牌堆
 
-    public int PlayrCardId, EnemyCardId;
+    public string PlayrCardId, EnemyCardId;
 
     public List<string> HandCardId = new List<string>(); 
 
@@ -39,6 +39,8 @@ public class BattleMgr : MonoBehaviour
 
     [SerializeField] 
     public List<GameObject> AllEffect = new List<GameObject>(); //所有效果
+
+    private int PlayerLife = 3; //玩家生命
 
     //堅定效果 迴避效果 反擊 預測牌 稟告 自我打氣 自我保護
     private Dictionary<string, int> EffectAndCount = new Dictionary<string, int>()
@@ -76,7 +78,7 @@ public class BattleMgr : MonoBehaviour
             
             GameObject NowCard = Instantiate(Card_deck, Card_deck.transform.parent); //生成卡片
             
-            senceSystem.BidingImageToObject(NowCard, int.Parse(senceSystem.CardBackpack[GetRandTarger]));
+            senceSystem.BidingImageToObject(NowCard, senceSystem.CardBackpack[GetRandTarger]);
 
             NowCard.name = senceSystem.CardBackpack[GetRandTarger]; //賦予ID
 
@@ -121,9 +123,9 @@ public class BattleMgr : MonoBehaviour
 
         HandCardId.Remove(id); //移除手牌堆
         
-        PlayrCardId = int.Parse(id);
+        PlayrCardId = id;
 
-        PlayrCard.GetComponent<Image>().sprite = senceSystem.AllCardIame[PlayrCardId]; // 設定圖片
+        senceSystem.BidingImageToObject(PlayrCard, PlayrCardId); // 設定圖片
         
         PlayrCard.SetActive(true);
 
@@ -177,20 +179,23 @@ public class BattleMgr : MonoBehaviour
         
         int WinOrLose = 2; //1是勝利2是平手0是敗
 
-         
-        if (PlayrCardId <= 6) //0~6勸導
+        string PlayerType = PlayrCardId.Split("_")[0]; //玩家的牌分類 
+
+        string EnemyTyoe = EnemyCardId.Split("_")[0]; //敵人的牌分類
+        
+        if (PlayerType == "advise") //0~6勸導
         {
-            if (EnemyCardId <= 6) //0~6防禦
+            if (EnemyTyoe == "defense") //0~6防禦
             {
                 result.text = "勝";
                 WinOrLose = 1;
             }
-            else if(7 <= EnemyCardId && EnemyCardId <= 14) //7~13傷害
+            else if(EnemyTyoe == "damage") //7~13傷害
             {
                 result.text = "敗";
                 WinOrLose = 0;
             }
-            else if (EnemyCardId >=15)//14~20驚嚇
+            else if (EnemyTyoe == "scare")//14~20驚嚇
             {
                 result.text = "平手";
                 
@@ -198,21 +203,21 @@ public class BattleMgr : MonoBehaviour
 
             }
         }
-        else if(7 <= PlayrCardId && PlayrCardId <= 14) //7~13堅定
+        else if(PlayerType == "inspire") //7~13堅定
         {
-            if (EnemyCardId <= 6) //0~6防禦
+            if (EnemyTyoe == "defense") //0~6防禦
             {
                 result.text = "平手";
                 
                 WinOrLose = 2;
             }
-            else if(7 <= EnemyCardId && EnemyCardId <= 14) //7~13傷害
+            else if(EnemyTyoe == "damage") //7~13傷害
             {
                 result.text = "勝";
                 WinOrLose = 1;
 
             }
-            else if (EnemyCardId >=15)//14~20驚嚇
+            else if (EnemyTyoe =="scare")//14~20驚嚇
             {
                 result.text = "敗";
 
@@ -220,22 +225,22 @@ public class BattleMgr : MonoBehaviour
 
             }
         }
-        else if (PlayrCardId >=14) //14~20激勵
+        else if (PlayerType =="steadfast") //14~20激勵
         {
-            if (EnemyCardId <= 6) //0~6防禦
+            if (EnemyTyoe == "defense") //0~6防禦
             {
                 result.text = "敗";
 
                 WinOrLose = 0;
 
             }
-            else if(7 <= EnemyCardId && EnemyCardId <= 14) //7~13傷害
+            else if(EnemyTyoe == "damage") //7~13傷害
             {
                 result.text = "平手";
                 
                 WinOrLose = 2;
             }
-            else if (EnemyCardId >=15)//14~20驚嚇
+            else if (EnemyTyoe =="scare")//14~20驚嚇
             {
                 result.text = "勝";
 
@@ -254,14 +259,14 @@ public class BattleMgr : MonoBehaviour
         }
         
         //當具有小雨傘效果時輸掉時 並且玩家的牌不是堅定牌 扭轉成贏的
-        if (WinOrLose == 0 && EffectAndCount["firm"] > 0 && PlayrCardId  < 7 && PlayrCardId >= 14) //當具有堅定效果時輸掉時 扭轉成贏的
+        if (WinOrLose == 0 && EffectAndCount["firm"] > 0 && PlayerType !="steadfast") //當具有堅定效果時輸掉時 扭轉成贏的
         {
             result.text = "觸發小雨傘 勝";
 
             WinOrLose = 1;
         }
 
-        if(WinOrLose == 1 && PlayrCardId <14 && EffectAndCount["report"] > 0)
+        if(WinOrLose == 1 && PlayerType !="inspire" && EffectAndCount["report"] > 0)
         {
             result.text = "觸發稟告 勝";
 
@@ -272,7 +277,7 @@ public class BattleMgr : MonoBehaviour
 
         }
 
-        if (WinOrLose == 1 && PlayrCardId >= 14 && EffectAndCount["cheer"] > 0)
+        if (WinOrLose == 1 && PlayerType =="inspire" && EffectAndCount["cheer"] > 0)
         {
             result.text = "觸發自我打氣效果 勝";
 
@@ -460,17 +465,17 @@ public class BattleMgr : MonoBehaviour
             }
                 else
             {
-                if (EnemyCardId <= 6) //0~6防禦
+                if (EnemyTyoe == "defense") //0~6防禦
                 {
                 
                 }
-                else if(7 <= EnemyCardId && EnemyCardId < 14) //7~13傷害
+                else if(EnemyTyoe == "damage") //7~13傷害
                 {
-                    PlayerHealth.value -= 10; //減少san值
+                    PlayerDamage(10); //減少san值
                 }
-                else if (EnemyCardId >=15)//14~20驚嚇
+                else if (EnemyTyoe == "scare")//14~20驚嚇
                 {
-                    PlayerHealth.value -= 5; //減少san值
+                    PlayerDamage(5); //減少san值
                 }
             }
             
@@ -537,12 +542,40 @@ public class BattleMgr : MonoBehaviour
         OnJudge = false; //結束審判
     }
 
+    public void PlayerDamage(int value) //玩家受到傷害
+    {
+        PlayerHealth.value -= value;
+
+        if (PlayerHealth.value == 0) //當玩家沒血
+        {
+            if (PlayerLife == 0) //當玩家沒意志
+            {
+                LoseGameEvent();
+            }
+        }
+        else //還有意志值
+        {
+            PlayerLife -= 1; //-1意志
+
+            PlayerHealth.value = PlayerHealth.maxValue; //回復至滿血
+        }
+    }
+
+    public async Task LoseGameEvent() //遊戲結束 失敗
+    {
+        await Task.Delay(1000);
+        
+        senceSystem.LoadScene("s0");
+    }
+    
     public void BossChooseCard()
     {
-        EnemyCardId = Random.Range(0, 21);
+        string[] AllEnemyTag = new string[] { "defense", "damage", "scare" };
+
+        EnemyCardId = AllEnemyTag[Random.Range(0, AllEnemyTag.Length)];
         
-        EnemyCard.GetComponent<Image>().sprite = senceSystem.AllCardIame[EnemyCardId];
-        
+        senceSystem.BidingImageToObject(EnemyCard, EnemyCardId, true);//設定圖片
+
         EnemyCard.SetActive(true);
 
     }
