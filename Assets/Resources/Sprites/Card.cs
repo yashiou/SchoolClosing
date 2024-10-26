@@ -28,17 +28,22 @@ public class Card : MonoBehaviour
 
     [SerializeField] 
     private bool Tester;//測試者模式
-    
+
+    [SerializeField] 
+    private int testcard = 0;//要測試號碼
+
+
+
     void Start()
     {
-
+        
         senceSystem = FindObjectOfType<SenceSystem>(); //從倉庫抓數據過來
 
         if (Tester)
         {
             for (int i = 0; i < 21; i++)
             {
-                senceSystem.CardBackpack.Add(Random.Range(0, 21).ToString());
+                senceSystem.CardBackpack.Add(testcard.ToString());
             }
         }
 
@@ -64,8 +69,7 @@ public class Card : MonoBehaviour
             Card_button.onClick.AddListener(() => CardEvent(Card.name));
             
         }
-        
-        
+
     }
 
     public void DeleetCard(string id,GameObject CardObject) //刪除卡牌

@@ -383,6 +383,7 @@ MonoBehaviour:
   Card_Hint: {fileID: 1740389173}
   ShowCardBig: {fileID: 1463946532}
   Tester: 1
+  testcard: 18
 --- !u!4 &379511898
 Transform:
   m_ObjectHideFlags: 0
