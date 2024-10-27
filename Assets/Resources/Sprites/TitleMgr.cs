@@ -10,6 +10,9 @@ public class TitleMgr : MonoBehaviour
     void Start()
     {
         senceSystem = FindObjectOfType<SenceSystem>();
+        
+        senceSystem.audieMusic.PlayerMusic(0); //抓音樂
+
     }
 
     public void InToGame(string name)

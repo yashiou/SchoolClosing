@@ -14,6 +14,8 @@ public class SenceSystem : MonoBehaviour //儲存牌組數據
     public List<Sprite> AllCardIame = new List<Sprite>();
 
     public List<Sprite> EnemyCardIameg = new List<Sprite>();
+
+    public AudieMusic audieMusic; //音樂管理員
     private void Awake()
     {
         DontDestroyOnLoad(gameObject);
@@ -124,7 +126,7 @@ public class SenceSystem : MonoBehaviour //儲存牌組數據
     // Start is called before the first frame update
     void Start()
     {
-        
+        audieMusic = FindObjectOfType<AudieMusic>();
     }
 
     // Update is called once per frame
