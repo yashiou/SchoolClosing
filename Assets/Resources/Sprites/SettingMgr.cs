@@ -16,17 +16,19 @@ public class SettingMgr : MonoBehaviour
     
     [SerializeField] 
     private Slider AllSoundSlider;
-
-    // Start is called before the first frame update
+    
     void Start()
     {
         audieMusic = FindObjectOfType<AudieMusic>();
     }
-
-    // Update is called once per frame
+    
     void Update()
     {
-        
+        MusicSlider.value = audieMusic.MusicSoundValue; //同步音樂管理員
+
+        AudioSlider.value = audieMusic.AudioSoundValue; 
+
+        AllSoundSlider.value = audieMusic.AllSoundValue;
     }
 
     public void MusicSoundChange() //改變音樂
