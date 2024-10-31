@@ -56,9 +56,9 @@ public class TeachingMgr : MonoBehaviour
             Already = TurnOffLast(); //檢查是否執行過關閉上次事件
             
             NowShowImage = ShowImage[index]; //將當前圖片修改
-
+            
             NowShowImage.gameObject.SetActive(true);
-
+            
             PageNum = index; //紀錄這次的頁數 ( 下一次呼叫時 會視為"上次的物件"
 
             all_dot[index].color = Color.black;
@@ -67,9 +67,7 @@ public class TeachingMgr : MonoBehaviour
         if (index >= 0 && index < Pagetext.Count)
         {
             if (!Already)TurnOffLast();
-            
-            TurnOffLast();
-            
+
             NowShowText = Pagetext[index];
 
             NowShowText.gameObject.SetActive(true);
@@ -114,4 +112,3 @@ public class TeachingMgr : MonoBehaviour
 
         }
     }
-//圖片會消失 要做存檔跟無盡模式

@@ -42,6 +42,15 @@ public class BattleMgr : MonoBehaviour
 
     private int PlayerLife = 3; //玩家生命
 
+    private int point = 0; //擊倒敵人數
+
+    private Playerseves playerseves;
+        
+    [SerializeField] 
+    public AnimeMgr animeMgr;
+
+    [SerializeField] 
+    public Text showpoint; //顯示擊倒數
     //堅定效果 迴避效果 反擊 預測牌 稟告 自我打氣 自我保護
     private Dictionary<string, int> EffectAndCount = new Dictionary<string, int>()
     {
@@ -58,6 +67,8 @@ public class BattleMgr : MonoBehaviour
     void Start()
     {
         senceSystem = FindObjectOfType<SenceSystem>();
+
+        animeMgr.CallNextEnemys();
         
         for (int i = 0; i < 3; i++) //獲取手牌
         {
@@ -95,7 +106,7 @@ public class BattleMgr : MonoBehaviour
         {
             Washcard();
         }
-    }
+    } //獲得手牌
 
     public void Washcard()
     {
@@ -113,7 +124,7 @@ public class BattleMgr : MonoBehaviour
         {
             GetCard();
         }
-    }
+    } //洗牌
     public void UseCard(GameObject gameObject,string id, string replaceCardId)
     {
         if (OnJudge)//審判中
@@ -147,7 +158,7 @@ public class BattleMgr : MonoBehaviour
         }
         senceSystem.CardBackpack.Remove(id); //移除指定的卡
         CardStack.transform.GetChild(0).GetComponent<Text>().text = senceSystem.CardBackpack.Count.ToString(); //卡牌數
-    }
+    } //使用牌
 
     public void GetEffect(GameObject who, string Effect) //效果賦予
     {
@@ -166,7 +177,7 @@ public class BattleMgr : MonoBehaviour
         EffectAndCount[Effect] = 2 ; //給予存在兩回合
         
         
-    }
+    } //賦予效果
 
     //public void UseEffect(bool Open, string terEffect = "")//使用後移除效果 如果是移除要指定
     //{
@@ -177,6 +188,243 @@ public class BattleMgr : MonoBehaviour
     {
         OnJudge = true;
         
+        int WinOrLose = WhoWin(); //1是勝利2是平手0是敗
+
+        //UseEffect(true);//處發效果
+        
+        result.gameObject.SetActive(true);
+
+        await Task.Delay(2000);//等待兩秒
+        
+        result.gameObject.SetActive(false);
+        
+        if (WinOrLose == 1) //成功時
+        {
+            PlayerWin(id);
+        }
+        else if (WinOrLose == 0)//失敗時
+        {
+            BossWin(id);
+        }
+        else if (WinOrLose == 2)
+        {
+            if (id == "20") //反抗
+            {
+                BossGetDamage(20, false);
+            }   
+        }
+        PlayrCard.SetActive(false);
+        
+        EnemyCard.SetActive(false);
+
+        
+        
+        for (int i = 0; i < 2; i++) //抽牌
+        {
+            GetCard();
+            
+            if (HandCardId.Count >=5)
+            {
+                break;
+            }
+        }
+
+        DecreaseEffect();//檢索有效果1回合
+
+        if (EffectAndCount["KnowBossCard"] > 0) //預測牌效果
+        {
+            BossChooseCard(); //提前讓敵人打牌
+        }
+        
+        OnJudge = false; //結束審判
+    }
+
+    public async void BossWin(string id)
+    {
+        string EnemyTyoe = EnemyCardId.Split("_")[0];
+
+            switch (id)
+            {
+                case "0" :
+                    BossGetDamage(75, true); //失敗時減少75怨恨
+                    break;
+                case "1" :
+                    
+                    break;
+                case "2":
+                    break;
+                case "3" :
+                    break;
+                case "4":
+                    break;
+                case "5" :
+                    break;
+                case "6":
+                    break;
+                case "7" :
+                    break;
+                case "8":
+                    break;
+                case "9" :
+                    break;
+                case "10": //小雨傘
+                    EffectAndCount["avoid"] = 2; //打開迴避效果
+                    break;
+                case "11" : //應激
+                    EffectAndCount["counterattack"] = 2; //打開反擊效果
+                    break;
+                case "12": 
+                    break;
+                case "13" :
+                    break;
+                case "14":
+                    break;
+                case "15" :
+                    break;
+                case "16":
+                    break;
+                case "17" :
+                    break;
+                case "18":
+                    break;
+                case "19" :
+                    break;
+                case "20":
+                    break;
+                default: 
+                    break;
+            }
+            if (EffectAndCount["avoid"] > 0)
+            {
+                result.text = "觸發迴避效果";
+                
+                result.gameObject.SetActive(true);
+
+                await Task.Delay(1000);//等待兩秒
+        
+                result.gameObject.SetActive(false);
+            }
+            else if (EffectAndCount["counterattack"] > 0)
+            {
+                result.text = "觸發反擊效果";
+                
+                result.gameObject.SetActive(true);
+
+                BossGetDamage(5, true);
+
+                await Task.Delay(1000);//等待兩秒
+        
+                result.gameObject.SetActive(false);
+            }
+                else
+            {
+                if (EnemyTyoe == "defense") //0~6防禦
+                {
+                
+                }
+                else if(EnemyTyoe == "damage") //7~13傷害
+                {
+                    PlayerDamage(10); //減少san值
+                }
+                else if (EnemyTyoe == "scare")//14~20驚嚇
+                {
+                    PlayerDamage(5); //減少san值
+                }
+            }
+    } //敵人獲勝
+
+    public void PlayerWin(string id)
+    {
+        switch (id)
+            {
+                case "0": //唯一的的方法
+                    BossGetDamage(10, true);
+                    break;
+                case "1"://心理疏導
+                    BossGetDamage(50, true);
+                    break;
+                case "2"://嘴砲 
+                    BossGetDamage(25, true);
+                    break;
+                case "3"://反擊譏諷
+                    BossGetDamage(100, true);
+                    break;
+                case "4"://心理弱點
+                    BossGetDamage(50, true);
+                    break;
+                case "5"://撕破偽裝
+                    BossGetDamage(25, true);
+
+                    PlayerHealth.value += 20;
+                    break;
+                case "6"://堅持
+                    BossGetDamage(50, true);
+
+                    PlayerHealth.value -= 10;
+                    break;
+                case "7"://格檔
+                    break;
+                case "8"://替換
+                    if (HandCardId.Count > 0)
+                    {
+                        int RandChangeCard = Random.Range(0, HandCardId.Count);
+                        {
+                            //刪掉指定的物體
+                            Destroy(Card_deck.transform.parent.GetChild(RandChangeCard + 1).gameObject);
+
+                            //將格檔牌加入手牌堆 -> 換成格檔牌 並紀錄替換原ID
+                            GetCard(DeffCardId, HandCardId[RandChangeCard]);
+
+                            HandCardId.RemoveAt(RandChangeCard); //刪除手牌堆id                           
+                        }
+                    }
+                    break;
+                case "9": //小雨傘
+                    GetEffect(PlayrEffectBar,"firm"); //給予玩家堅定效果
+
+                    break;
+                case "10":
+                    break;
+                case "11":
+                    break;
+                case "12": //危機意識
+                    EffectAndCount["KnowBossCard"] = 2;
+                    break;
+                case "13": //蜷縮
+                    PlayerHealth.value += 5;
+                    break;
+                case "14": //振奮
+                    BossGetDamage(10, false);
+                    break;
+                case "15"://自我信任
+                    BossGetDamage(15, false);
+                    break;
+                case "16"://稟告
+                    GetEffect(PlayrEffectBar,"report"); //給予玩家稟告效果
+                    break;
+                case "17":
+                    GetEffect(PlayrEffectBar, "cheer"); //給予玩家自我打氣效果
+                    break;
+                case "18":
+                    BossGetDamage(10, false);
+
+                    GetEffect(PlayrEffectBar, "protect"); //給予Boss自我保護負面效果
+                    break;
+                case "19": //反抗
+                    BossGetDamage(10, false);
+                    
+                    break;
+                case "20"://箝制
+                    BossGetDamage(15, false);
+
+                    break;
+                default:
+                    break;
+            }
+    } //玩家獲勝
+    
+    public int WhoWin()
+    {
         int WinOrLose = 2; //1是勝利2是平手0是敗
 
         string PlayerType = PlayrCardId.Split("_")[0]; //玩家的牌分類 
@@ -249,8 +497,6 @@ public class BattleMgr : MonoBehaviour
             }
         }
 
-        //UseEffect(true);//處發效果
-        
         if(WinOrLose ==0 && EffectAndCount["protect"] > 0) //當具有自我保護效果時輸掉時 改成平手
         {
             result.text = "觸發自我保護 平手";
@@ -270,10 +516,7 @@ public class BattleMgr : MonoBehaviour
         {
             result.text = "觸發稟告 勝";
 
-            if (BoossAnger.value <=0)
-            {
-                BoossHealth.value -= 20;
-            }
+            BossGetDamage(20, false);
 
         }
 
@@ -281,238 +524,52 @@ public class BattleMgr : MonoBehaviour
         {
             result.text = "觸發自我打氣效果 勝";
 
-            if (BoossAnger.value <=0)
-            {
-                BoossHealth.value -= 20;
-            }
+            BossGetDamage(20, false);
         }
         
-        result.gameObject.SetActive(true);
+        return WinOrLose;
+    } //檢查誰贏
+    
+    
 
-        await Task.Delay(2000);//等待兩秒
-        
-        result.gameObject.SetActive(false);
-        
-        if (WinOrLose == 1) //成功時
+    public void PlayerDamage(int value) //玩家受到傷害
+    {
+        PlayerHealth.value -= value;
+
+        if (PlayerHealth.value == 0) //當玩家沒血
         {
-            switch (id)
+            if (PlayerLife == 0) //當玩家沒意志
             {
-                case "0": //唯一的的方法
-                    BoossAnger.value -= 10; 
-                    break;
-                case "1"://心理疏導
-                    BoossAnger.value -= 50; 
-                    break;
-                case "2"://嘴砲 
-                    BoossAnger.value -= 25;
-                    break;
-                case "3"://反擊譏諷
-                    BoossAnger.value -= 100;
-                    break;
-                case "4"://心理弱點
-                    BoossAnger.value -= 50;
-                    break;
-                case "5"://撕破偽裝
-                    BoossAnger.value -= 25;
-
-                    PlayerHealth.value += 20;
-                    break;
-                case "6"://堅持
-                    BoossAnger.value -= 50;
-
-                    PlayerHealth.value -= 10;
-                    break;
-                case "7"://格檔
-                    break;
-                case "8"://替換
-                    if (HandCardId.Count > 0)
-                    {
-                        int RandChangeCard = Random.Range(0, HandCardId.Count);
-                        {
-                            //刪掉指定的物體
-                            Destroy(Card_deck.transform.parent.GetChild(RandChangeCard + 1).gameObject);
-
-                            //將格檔牌加入手牌堆 -> 換成格檔牌 並紀錄替換原ID
-                            GetCard(DeffCardId, HandCardId[RandChangeCard]);
-
-                            HandCardId.RemoveAt(RandChangeCard); //刪除手牌堆id                           
-                        }
-                    }
-                    break;
-                case "9": //小雨傘
-                    GetEffect(PlayrEffectBar,"firm"); //給予玩家堅定效果
-
-                    break;
-                case "10":
-                    break;
-                case "11":
-                    break;
-                case "12": //危機意識
-                    EffectAndCount["KnowBossCard"] = 2;
-                    break;
-                case "13": //蜷縮
-                    PlayerHealth.value += 5;
-                    break;
-                case "14": //振奮
-                    if(BoossAnger.value <= 0)
-                        BoossHealth.value -= 10;
-                    break;
-                case "15"://自我信任
-                    if (BoossAnger.value <= 0)
-                        BoossHealth.value -= 15;
-                    break;
-                case "16"://稟告
-                    GetEffect(PlayrEffectBar,"report"); //給予玩家稟告效果
-                    break;
-                case "17":
-                    GetEffect(PlayrEffectBar, "cheer"); //給予玩家自我打氣效果
-                    break;
-                case "18":
-                    if (BoossAnger.value <= 0)
-                        BoossHealth.value -= 10;
-                    
-                    GetEffect(PlayrEffectBar, "protect"); //給予Boss自我保護負面效果
-                    break;
-                case "19": //反抗
-                    if (BoossAnger.value <= 0)
-                        BoossHealth.value -= 10;
-                    
-                    
-                    break;
-                case "20"://箝制
-                    if (BoossAnger.value <= 0)
-                        BoossHealth.value -= 15;
-                    break;
-                default:
-                    break;
+                LoseGameEvent();
             }
-            
         }
-        else if (WinOrLose == 0)//失敗時
+        else //還有意志值
         {
-            switch (id)
-            {
-                case "0" :
-                    BoossAnger.value -= 75; //失敗時減少75怨恨
-                    break;
-                case "1" :
-                    
-                    break;
-                case "2":
-                    break;
-                case "3" :
-                    break;
-                case "4":
-                    break;
-                case "5" :
-                    break;
-                case "6":
-                    break;
-                case "7" :
-                    break;
-                case "8":
-                    break;
-                case "9" :
-                    break;
-                case "10": //小雨傘
-                    EffectAndCount["avoid"] = 2; //打開迴避效果
-                    break;
-                case "11" : //應激
-                    EffectAndCount["counterattack"] = 2; //打開反擊效果
-                    break;
-                case "12": 
-                    break;
-                case "13" :
-                    break;
-                case "14":
-                    break;
-                case "15" :
-                    break;
-                case "16":
-                    break;
-                case "17" :
-                    break;
-                case "18":
-                    break;
-                case "19" :
-                    break;
-                case "20":
-                    break;
-                default: 
-                    break;
-            }
-            if (EffectAndCount["avoid"] > 0)
-            {
-                result.text = "觸發迴避效果";
-                
-                result.gameObject.SetActive(true);
+            PlayerLife -= 1; //-1意志
 
-                await Task.Delay(1000);//等待兩秒
-        
-                result.gameObject.SetActive(false);
-            }
-            else if (EffectAndCount["counterattack"] > 0)
-            {
-                result.text = "觸發反擊效果";
-                
-                result.gameObject.SetActive(true);
-
-                BoossAnger.value -= 5;
-                
-                await Task.Delay(1000);//等待兩秒
-        
-                result.gameObject.SetActive(false);
-            }
-                else
-            {
-                if (EnemyTyoe == "defense") //0~6防禦
-                {
-                
-                }
-                else if(EnemyTyoe == "damage") //7~13傷害
-                {
-                    PlayerDamage(10); //減少san值
-                }
-                else if (EnemyTyoe == "scare")//14~20驚嚇
-                {
-                    PlayerDamage(5); //減少san值
-                }
-            }
-            
+            PlayerHealth.value = PlayerHealth.maxValue; //回復至滿血
         }
-        else if (WinOrLose == 2)
-        {
-            if (id == "20") //反抗
-            {
-                if (BoossAnger.value <= 0)
-                {
-                    BoossHealth.value -= 20;
-                }
-            }   
-        }
-        PlayrCard.SetActive(false);
-        
-        EnemyCard.SetActive(false);
+    }
 
-        
-        
-        for (int i = 0; i < 2; i++) //抽牌
-        {
-            GetCard();
-            
-            if (HandCardId.Count >=5)
-            {
-                break;
-            }
-        }
-
+    public void DecreaseEffect(bool Clear = false)
+    {
         List<string> tempEffectname = new List<string>(EffectAndCount.Keys);
         
         foreach(string s in tempEffectname) //瀏覽所有效果
         {
             if(EffectAndCount[s] > 0) //減所有效果1回合
             {
-                EffectAndCount[s] -= 1; //將所有效果-1回合
+
+                if (Clear)
+                {
+                    EffectAndCount[s] -= EffectAndCount[s]; //將所有效果-1回合
+
+                }
+                else
+                {
+                    EffectAndCount[s] -= 1; //將所有效果-1回合
+
+                }
             }
             
             if(EffectAndCount[s] == 0 && //當玩家或敵人有效果 
@@ -533,31 +590,55 @@ public class BattleMgr : MonoBehaviour
                 }
             }
         }
-
-        if (EffectAndCount["KnowBossCard"] > 0) //預測牌效果
-        {
-            BossChooseCard(); //提前讓敵人打牌
-        }
-        
-        OnJudge = false; //結束審判
     }
-
-    public void PlayerDamage(int value) //玩家受到傷害
+    
+    public async void BossGetDamage(int value, bool isAnger) //敵人受傷
     {
-        PlayerHealth.value -= value;
-
-        if (PlayerHealth.value == 0) //當玩家沒血
+        if (isAnger)
         {
-            if (PlayerLife == 0) //當玩家沒意志
+            BoossAnger.value -= value;
+        }
+        else
+        {
+            if (BoossAnger.value <=0)
             {
-                LoseGameEvent();
+                BoossHealth.value -= value;
             }
         }
-        else //還有意志值
+        if (BoossHealth.value == 0)
         {
-            PlayerLife -= 1; //-1意志
+            
+            point += 100; //擊倒值+1
 
-            PlayerHealth.value = PlayerHealth.maxValue; //回復至滿血
+            showpoint.text = $"分數:{point}"; //同步顯示
+            
+            animeMgr.EnemyDie();
+
+            await Task.Delay(1000); //因為無盡模式 要再次呼叫敵人
+            
+            animeMgr.CallNextEnemys();
+
+            DecreaseEffect(false);
+
+            PlayerData data = new PlayerData();
+
+            data.point = point; //分數紀錄
+
+            data.CardBackpack = senceSystem.CardBackpack; //紀錄卡堆
+
+            data.HandCard = HandCardId; //記錄手牌堆
+
+            data.UsedCard = UsedCard; //紀錄棄牌堆
+
+            data.PlayerHealth = PlayerHealth.value; //紀錄玩家血量
+
+            data.BoossAnger = BoossAnger.value; //紀錄敵人怒氣
+
+            data.PlayerHealth = BoossAnger.value; //紀錄敵人存在
+
+            data.PlayerLife = PlayerLife; //紀錄玩家意志值
+
+            playerseves.Seve(data); //使用紀錄函數
         }
     }
 
