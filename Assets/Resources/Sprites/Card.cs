@@ -154,7 +154,7 @@ public class Card : MonoBehaviour
 
             if (cardLimit == 3)
             {
-                return;
+                //return; 
             }
         }
         

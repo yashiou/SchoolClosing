@@ -16,6 +16,7 @@ public class SenceSystem : MonoBehaviour //儲存牌組數據
     public List<Sprite> EnemyCardIameg = new List<Sprite>();
 
     public AudieMusic audieMusic; //音樂管理員
+    
     private void Awake()
     {
         DontDestroyOnLoad(gameObject);

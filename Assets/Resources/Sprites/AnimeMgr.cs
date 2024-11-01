@@ -16,6 +16,8 @@ public class AnimeMgr : MonoBehaviour
     public void CallNextEnemys()
     {
         NowEnemy = Enemys[NowEnemyIndex];
+        
+        NowEnemy.SetActive(true);
 
         NowEnemyIndex = NowEnemyIndex + 1 > Enemys.Count ? NowEnemyIndex++ : 0;
 

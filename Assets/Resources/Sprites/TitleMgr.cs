@@ -21,9 +21,17 @@ public class TitleMgr : MonoBehaviour
 
         playerseves = FindAnyObjectByType<Playerseves>(); 
 
-        if (playerseves.Load() !=null)
+        if (playerseves.Load() ==null)
         {
             ContinueButton.GetComponent<Image>().color = Color.gray; //按鈕便灰色
+            
+            ContinueButton.GetComponent<Button>().enabled = false;
+        }
+        else
+        {
+            ContinueButton.GetComponent<Image>().color = Color.white;
+            //找到之前的存檔 啟用按鈕
+            ContinueButton.GetComponent<Button>().onClick.AddListener(() => Loading());
         }
         
     }
@@ -49,6 +57,12 @@ public class TitleMgr : MonoBehaviour
     {
         Application.Quit();
     }
+    
+    public void Loading()
+    { 
+        playerseves.Loading();
+    }
+    
     // Update is called once per frame
     void Update()
     {

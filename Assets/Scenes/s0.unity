@@ -206,10 +206,10 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 967900674}
-        m_TargetAssemblyTypeName: TitleMgr, Assembly-CSharp
-        m_MethodName: SeveMusic
-        m_Mode: 1
+      - m_Target: {fileID: 1169383531}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -2063,7 +2063,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   senceSystem: {fileID: 0}
   playerseves: {fileID: 0}
-  ContinueButton: {fileID: 0}
+  ContinueButton: {fileID: 2119687823}
 --- !u!4 &967900675
 Transform:
   m_ObjectHideFlags: 0
@@ -3404,7 +3404,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u5B58\u6A94"
+  m_Text: "\u7E7C\u7E8C"
 --- !u!222 &1436519850
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4935,26 +4935,14 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 967900674}
         m_TargetAssemblyTypeName: TitleMgr, Assembly-CSharp
-        m_MethodName: InToGame
-        m_Mode: 5
+        m_MethodName: Loading
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: CardScene
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: TitleMgr, Assembly-CSharp
-        m_MethodName: 
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &2119687826
