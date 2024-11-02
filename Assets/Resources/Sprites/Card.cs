@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using Object = UnityEngine.Object;
 using System.Threading.Tasks;
 using Random = UnityEngine.Random;
+using System.Linq;
 
 public class Card : MonoBehaviour
 {
@@ -62,11 +63,24 @@ public class Card : MonoBehaviour
 
             showcard.ShowBigImage = ShowCardBig;//放大牌綁定
 
+            Text Cardtext = Card.GetComponentInChildren<Text>();
+
+            //根據ID找到所有符合條件的物件TextData物件 並整理成數據 交給.ToList()轉成陣列
+            List<TextData> textData = senceSystem.CardText.TextFormat.Where(x => x.id == Card.name.Split("_")[1] ).ToList();
+
+            showcard.CardEffect = textData[0].Effect;//效果
+            
+            Cardtext.text = textData[0].Name;//給予名字
+            
             showcard.card = this;
 
             Button Card_button = Card.GetComponent<Button>();
             
-            Card_button.onClick.AddListener(() => CardEvent(Card.name));
+            
+            
+            Card_button.onClick.AddListener(() => CardEvent(Card.name)); //驅動事件
+            
+            
             
         }
 
@@ -103,6 +117,15 @@ public class Card : MonoBehaviour
             
             ClearList.Add(Card);
 
+            Text Cardtext = Card.GetComponentInChildren<Text>();
+
+            
+            //根據ID找到所有符合條件的物件TextData物件 並整理成數據 交給.ToList()轉成陣列
+            List<TextData> textData = senceSystem.CardText.TextFormat.Where(x => x.id == Card.name.Split("_")[1] ).ToList();
+
+            Cardtext.text = textData[0].Name;//給予名字
+
+            
             Card_button.onClick.AddListener(() => DeleetCard(Card.name, Card));
 
             
@@ -154,7 +177,7 @@ public class Card : MonoBehaviour
 
             if (cardLimit == 3)
             {
-                //return; 
+                return; 
             }
         }
         

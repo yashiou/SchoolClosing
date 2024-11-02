@@ -1,13 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Threading.Tasks;
-using UnityEditor.VersionControl;
-using UnityEngine.PlayerLoop;
-using Debug = UnityEngine.Debug;
 using Task = System.Threading.Tasks.Task;
 
 public class BattleMgr : MonoBehaviour
@@ -56,6 +50,9 @@ public class BattleMgr : MonoBehaviour
 
     [SerializeField] 
     public GameObject PlayerWill;
+
+    [SerializeField] 
+    public Text CardNameShow;
 
     [SerializeField] 
     public Text showpoint; //顯示擊倒數
@@ -108,7 +105,6 @@ public class BattleMgr : MonoBehaviour
         }
         for (int i = 0; i < 3; i++) //獲取手牌
         {
-            Debug.Log("1");
             GetCard();
         }
     }
@@ -137,6 +133,14 @@ public class BattleMgr : MonoBehaviour
             Button CardButton = NowCard.GetComponent<Button>(); //每張卡牌上的按鈕
 
             CardButton.onClick.AddListener(()=>UseCard(NowCard, NowCard.name, repleseCardId)); //將按鈕綁定事件
+            
+            //根據ID找到所有符合條件的物件TextData物件 並整理成數據 交給.ToList()轉成陣列
+            List<TextData> textData = senceSystem.CardText.TextFormat.Where(x => x.id == NowCard.name.Split("_")[1] ).ToList();
+
+            NowCard.GetComponent<ShowHandCard>().CardName = textData[0].Name;
+            
+            NowCard.GetComponent<ShowHandCard>().CardEffect = textData[0].Effect;
+
             
             NowCard.SetActive(true); //啟用卡牌
             
