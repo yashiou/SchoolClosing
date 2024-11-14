@@ -41,7 +41,7 @@ public class SenceSystem : MonoBehaviour //儲存牌組數據
 
     public void LoadAsset2CreateImage()
     {
-        foreach (Texture2D obj in Resources.LoadAll<Texture2D>("Models/advise"))
+        foreach (Texture2D obj in Resources.LoadAll<Texture2D>("Models/playercard/advise"))
         {
 
             Sprite sprite = Sprite.Create(obj, new Rect(0, 0, obj.width, obj.height)
@@ -50,13 +50,11 @@ public class SenceSystem : MonoBehaviour //儲存牌組數據
             sprite.name = "advise_" + obj.name;
 
             AllCardIame.Add(sprite);
-            
-            Resources.UnloadAsset(obj);
 
             Resources.UnloadAsset(obj);
         }
         
-        foreach (Texture2D obj in Resources.LoadAll<Texture2D>("Models/inspire"))
+        foreach (Texture2D obj in Resources.LoadAll<Texture2D>("Models/playercard/inspire"))
         {
 
             Sprite sprite = Sprite.Create(obj, new Rect(0, 0, obj.width, obj.height)
@@ -65,13 +63,24 @@ public class SenceSystem : MonoBehaviour //儲存牌組數據
             sprite.name = "inspire_" + obj.name;
 
             AllCardIame.Add(sprite);
-            
-            Resources.UnloadAsset(obj);
 
             Resources.UnloadAsset(obj);
         }
         
-        foreach (Texture2D obj in Resources.LoadAll<Texture2D>("Models/steadfast"))
+        foreach (Texture2D obj in Resources.LoadAll<Texture2D>("Models/playercard/resist"))
+        {
+
+            Sprite sprite = Sprite.Create(obj, new Rect(0, 0, obj.width, obj.height)
+                , new Vector2(1, 1));
+
+            sprite.name = "resist_" + obj.name;
+
+            AllCardIame.Add(sprite);
+
+            Resources.UnloadAsset(obj);
+        }
+        
+        foreach (Texture2D obj in Resources.LoadAll<Texture2D>("Models/playercard/steadfast"))
         {
 
             Sprite sprite = Sprite.Create(obj, new Rect(0, 0, obj.width, obj.height)
@@ -80,8 +89,6 @@ public class SenceSystem : MonoBehaviour //儲存牌組數據
             sprite.name = "steadfast_" + obj.name;
 
             AllCardIame.Add(sprite);
-            
-            Resources.UnloadAsset(obj);
 
             Resources.UnloadAsset(obj);
         }

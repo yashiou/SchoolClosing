@@ -478,68 +478,116 @@ public class BattleMgr : MonoBehaviour
 
         string EnemyTyoe = EnemyCardId.Split("_")[0]; //敵人的牌分類
         
-        if (PlayerType == "advise") //0~6勸導
+        if (PlayerType == "advise") //勸導
         {
-            if (EnemyTyoe == "defense") //0~6防禦
-            {
-                result.text = "勝";
-                WinOrLose = 1;
-            }
-            else if(EnemyTyoe == "damage") //7~13傷害
-            {
-                result.text = "敗";
-                WinOrLose = 0;
-            }
-            else if (EnemyTyoe == "scare")//14~20驚嚇
+            if (EnemyTyoe == "defense") //防禦
             {
                 result.text = "平手";
                 
                 WinOrLose = 2;
+            }
+            else if(EnemyTyoe == "damage") //傷害
+            {
+                result.text = "敗";
+                WinOrLose = 0;
+            }
+            else if (EnemyTyoe == "scare")//驚嚇
+            {
+                result.text = "平手";
+                
+                WinOrLose = 2;
+
+            }
+            else if (EnemyTyoe == "enhance") //強化
+            {
+                result.text = "勝";
+                
+                WinOrLose = 1;
+            }
+        }
+        else if(PlayerType == "inspire") //堅定
+        {
+            if (EnemyTyoe == "defense") //防禦
+            {
+                result.text = "平手";
+                
+                WinOrLose = 2;
+            }
+            else if(EnemyTyoe == "damage") //傷害
+            {
+                result.text = "勝";
+                
+                WinOrLose = 1;
+
+            }
+            else if (EnemyTyoe =="scare")//驚嚇
+            {
+                result.text = "平手";
+                
+                WinOrLose = 2;
+
+            }
+            else if (EnemyTyoe == "enhance") //強化
+            {
+                result.text = "敗";
+
+                WinOrLose = 0;
+            }
+        }
+        else if (PlayerType =="resist") //強化
+        {
+            if (EnemyTyoe == "defense") //防禦
+            {
+                result.text = "勝";
+
+                WinOrLose = 1;
+
+            }
+            else if (EnemyTyoe == "enhance") //強化
+            {
+                result.text = "平手";
+                
+                WinOrLose = 2;
+            }
+            else if(EnemyTyoe == "damage") //傷害
+            {
+                result.text = "平手";
+                
+                WinOrLose = 2;
+            }
+            else if (EnemyTyoe =="scare")//驚嚇
+            {
+                result.text = "敗";
+
+                WinOrLose = 0;
 
             }
         }
-        else if(PlayerType == "inspire") //7~13堅定
+        else if(PlayerType == "steadfast") //堅定
         {
-            if (EnemyTyoe == "defense") //0~6防禦
+            if (EnemyTyoe == "defense") //防禦
             {
                 result.text = "平手";
                 
                 WinOrLose = 2;
             }
-            else if(EnemyTyoe == "damage") //7~13傷害
-            {
-                result.text = "勝";
-                WinOrLose = 1;
-
-            }
-            else if (EnemyTyoe =="scare")//14~20驚嚇
-            {
-                result.text = "敗";
-
-                WinOrLose = 0;
-
-            }
-        }
-        else if (PlayerType =="steadfast") //14~20激勵
-        {
-            if (EnemyTyoe == "defense") //0~6防禦
-            {
-                result.text = "敗";
-
-                WinOrLose = 0;
-
-            }
-            else if(EnemyTyoe == "damage") //7~13傷害
+            else if (EnemyTyoe == "enhance") //強化
             {
                 result.text = "平手";
                 
                 WinOrLose = 2;
             }
-            else if (EnemyTyoe =="scare")//14~20驚嚇
+            else if(EnemyTyoe == "damage") //傷害
             {
                 result.text = "勝";
-
                 WinOrLose = 1;
+
+            }
+            else if (EnemyTyoe =="scare")//驚嚇
+            {
+                result.text = "敗";
+
+                WinOrLose = 0;
 
             }
         }

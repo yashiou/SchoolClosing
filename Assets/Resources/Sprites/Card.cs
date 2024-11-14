@@ -30,6 +30,13 @@ public class Card : MonoBehaviour
     [SerializeField] 
     private bool Tester;//測試者模式
 
+    private List<List<GameObject>> CardPage = new List<List<GameObject>>(); //翻頁儲存
+
+    private int CardPage_Now = 0;
+
+    [SerializeField] 
+    public GameObject Page_dot;
+    
     /*[SerializeField] 
     private int testcard = 0;*/ //要測試號碼
 
@@ -39,6 +46,11 @@ public class Card : MonoBehaviour
     {
         
         senceSystem = FindObjectOfType<SenceSystem>(); //從倉庫抓數據過來
+
+        string NowType = "";//初始化當前類型
+        
+        int NowPage = -1;
+        
 
         /*if (Tester)
         {
@@ -53,11 +65,20 @@ public class Card : MonoBehaviour
             
             GameObject Card = Instantiate(Card_prefab, Card_prefab.transform.parent);//生成
 
-            Card.name = senceSystem.AllCardIame[i].name;
+            Card.name = senceSystem.AllCardIame[i].name; //賦予牌
             
+            if (i % 21 == 0) //確認每
+            {
+                NowPage++;
+                
+                CardPage.Add(new List<GameObject>()); //創建新的一頁
+            }
+
             senceSystem.BidingImageToObject(Card, Card.name); //綁定id與圖片
             
-            Card.SetActive(true);
+            CardPage[NowPage].Add(Card); //在指定的頁數加入新牌
+
+            //Card.SetActive(true);
             
             Showcard showcard = Card.AddComponent<Showcard>();//放大牌
 
@@ -83,6 +104,15 @@ public class Card : MonoBehaviour
             
             
         }
+
+        for (int i = 0; i < CardPage.Count; i++)
+        {
+            GameObject dot = Instantiate(Page_dot, Page_dot.transform.parent);
+            
+            dot.SetActive(true);
+        }
+
+        ShowTargePage(0); //打開第0頁
 
     }
 
@@ -185,6 +215,34 @@ public class Card : MonoBehaviour
         senceSystem.CardBackpack.Add(id);
     }
 
+    public void TurnUp()
+    {
+        ShowTargePage(CardPage_Now - 1 );
+    }
+    
+    public void TurnDown()
+    {
+        ShowTargePage(CardPage_Now + 1 );
+    }
+
+    public void ShowTargePage(int TargePage)
+    {
+        if (TargePage >= CardPage.Count || TargePage < 0) //不能超出頁面
+        {
+            return;
+        }
+
+        //將視次的點設成灰色
+        Page_dot.transform.parent.GetChild(CardPage_Now +1 ).GetComponent<Image>().color = Color.gray;
+        
+        CardPage[CardPage_Now].ForEach((x) => x.SetActive(false)); //關閉上次頁面
+
+        CardPage_Now = TargePage;
+        
+        Page_dot.transform.parent.GetChild(CardPage_Now +1 ).GetComponent<Image>().color = Color.black;
+        
+        CardPage[CardPage_Now].ForEach((x) => x.SetActive(true)); //打開這次頁面
+    }
     // Update is called once per frame
     void Update()
     {
