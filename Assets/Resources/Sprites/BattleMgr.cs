@@ -56,7 +56,12 @@ public class BattleMgr : MonoBehaviour
 
     [SerializeField] 
     public Text showpoint; //顯示擊倒數
+
+    [SerializeField] 
+    public GameObject SHSButnUI; //默念心經
     
+    [SerializeField] 
+    public GameObject beliefButnUI; //信念支持
     //堅定效果 迴避效果 反擊 預測牌 稟告 自我打氣 自我保護
     private Dictionary<string, int> EffectAndCount = new Dictionary<string, int>()
     {
@@ -66,10 +71,20 @@ public class BattleMgr : MonoBehaviour
         {"KnowBossCard",0 },
         { "report",0},
         { "cheer",0},
-        { "protect",0}
+        { "protect",0},
+        {"block",0},
+        {"recover",0},
+        {"adrenaline",0},
+        {"SHS" ,0},
+        {"belief", 0}
     };
 
+    [SerializeField]
+    private string SHS_BossCard_id; //強制指定敵人ID
 
+    [SerializeField]
+    private string belief_PlaterCard_id; //強制指定玩家ID
+    
     void Start()
     {
         senceSystem = FindObjectOfType<SenceSystem>();
@@ -113,6 +128,7 @@ public class BattleMgr : MonoBehaviour
         if (senceSystem.CardBackpack.Count > 0)
         {
             GameObject NowCard = Instantiate(Card_deck, Card_deck.transform.parent); //生成卡片
+            
             
             if (TargetId != "")
             {
@@ -189,7 +205,11 @@ public class BattleMgr : MonoBehaviour
         {
             BossChooseCard(); //對手丟牌
         }
-        
+        else if (SHS_BossCard_id != "")
+        {
+            BossChooseCard(SHS_BossCard_id); //對手丟牌
+        }
+
         judgeSystem(id);
         
         
@@ -258,7 +278,19 @@ public class BattleMgr : MonoBehaviour
             if (CardIdNumber == "20") //反抗
             {
                 BossGetDamage(20, false);
-            }   
+            }
+            else if (EffectAndCount["adrenaline"] > 0)
+            {
+                result.text = "觸發腎上腺素效果";
+                
+                BossGetDamage(15,false);//-15存在
+                
+                result.gameObject.SetActive(true);
+                
+                await Task.Delay(1000);//等待兩秒
+        
+                result.gameObject.SetActive(false);
+            }
         }
         PlayrCard.SetActive(false);
         
@@ -282,7 +314,14 @@ public class BattleMgr : MonoBehaviour
         {
             BossChooseCard(); //提前讓敵人打牌
         }
-        
+        else if (EffectAndCount["SHS"] > 0)
+        {
+            SHSButnUI.SetActive(true);
+        }
+        else if (EffectAndCount["belief"] > 0)
+        {
+            beliefButnUI.SetActive(true);
+        }
         OnJudge = false; //結束審判
     }
 
@@ -363,6 +402,47 @@ public class BattleMgr : MonoBehaviour
         
                 result.gameObject.SetActive(false);
             }
+            else if (EffectAndCount["block"] > 0)
+            {
+                result.text = "觸發格檔傷害效果";
+                
+                result.gameObject.SetActive(true);
+                
+                await Task.Delay(1000);//等待兩秒
+        
+                result.gameObject.SetActive(false);
+            }
+            else if (EffectAndCount["recover"] > 0)
+            {
+                result.text = "觸發轉變傷害效果";
+                
+                if(EnemyTyoe == "damage") //7~13傷害
+                {
+                    PlayerHealth.value += 10; //增加san值
+                }
+                else if (EnemyTyoe == "scare")//14~20驚嚇
+                {
+                    PlayerHealth.value += 5; //增加san值
+                }
+                
+                result.gameObject.SetActive(true);
+                
+                await Task.Delay(1000);//等待兩秒
+        
+                result.gameObject.SetActive(false);
+            }
+            else if (EffectAndCount["adrenaline"] > 0)
+            {
+                result.text = "觸發腎上腺素效果";
+                
+                BossGetDamage(15,false);//-15存在
+                
+                result.gameObject.SetActive(true);
+                
+                await Task.Delay(1000);//等待兩秒
+        
+                result.gameObject.SetActive(false);
+            }
             else
             {
                 if (EnemyTyoe == "defense") //0~6防禦
@@ -377,10 +457,14 @@ public class BattleMgr : MonoBehaviour
                 {
                     PlayerDamage(5); //減少san值
                 }
+                else if (EnemyTyoe == "enhance")//14~20驚嚇
+                {
+                    BoossHealth.value += 10;//回復牌
+                }
             }
     } //敵人獲勝
 
-    public void PlayerWin(string id)
+    public async void PlayerWin(string id)
     {
         switch (id)
             {
@@ -465,8 +549,56 @@ public class BattleMgr : MonoBehaviour
                     BossGetDamage(15, false);
 
                     break;
+                case "22"://深呼吸
+                    PlayerHealth.value += 5;
+                    break;
+                
+                case "23"://肌肉放鬆
+                    GetEffect(PlayrEffectBar, "block"); //給予玩家格檔傷害效果
+                    break;
+                
+                case "24"://心跳加速
+                    GetEffect(PlayrEffectBar, "recover"); //給予玩家傷害變為恢復效果
+                    break;
+                
+                case "25": //腎上腺素
+                    GetEffect(PlayrEffectBar, "adrenaline"); //給予玩家腎上腺素效果
+                    break;
+                case "26": //默念心經
+                    GetEffect(PlayrEffectBar, "SHS"); //給予玩家默念心經效果
+                    break;
+                case "27": //回憶
+                    if (HandCardId.Count > 0)
+                    {
+                        int RandChangeCard = Random.Range(0, HandCardId.Count);
+                        {
+                            //刪掉指定的物體
+                            Destroy(Card_deck.transform.parent.GetChild(RandChangeCard + 1).gameObject);
+
+                            //將牌庫隨機牌加入手牌堆 ->  並紀錄替換原ID
+                            GetCard(senceSystem.CardBackpack[Random.Range(0,senceSystem.CardBackpack.Count)], HandCardId[RandChangeCard]);
+
+                            HandCardId.RemoveAt(RandChangeCard); //刪除手牌堆id                           
+                        }
+                    }
+                    break;
+                case "28": //信念支持
+                    GetEffect(PlayrEffectBar, "belief"); //給予玩家信念支持效果
+                    break;
                 default:
                     break;
+            }
+            if (EffectAndCount["adrenaline"] > 0)
+            {
+                result.text = "觸發腎上腺素效果";
+                    
+                BossGetDamage(15,false);//-15存在
+                    
+                result.gameObject.SetActive(true);
+                    
+                await Task.Delay(1000);//等待兩秒
+            
+                result.gameObject.SetActive(false);
             }
     } //玩家獲勝
     
@@ -475,6 +607,13 @@ public class BattleMgr : MonoBehaviour
         int WinOrLose = 2; //1是勝利2是平手0是敗
 
         string PlayerType = PlayrCardId.Split("_")[0]; //玩家的牌分類 
+        
+        if (belief_PlaterCard_id != "")
+        {
+            PlayerType = belief_PlaterCard_id;
+
+            belief_PlaterCard_id = "";
+        }
 
         string EnemyTyoe = EnemyCardId.Split("_")[0]; //敵人的牌分類
         
@@ -752,15 +891,32 @@ public class BattleMgr : MonoBehaviour
         senceSystem.LoadScene("s0");
     }
     
-    public void BossChooseCard()
+    public void BossChooseCard(string BossType = "")
     {
-        string[] AllEnemyTag = new string[] { "defense", "damage", "scare" };
+        if (BossType == "")
+        {
+            string[] AllEnemyTag = new string[] { "defense", "damage", "scare" };
 
-        EnemyCardId = AllEnemyTag[Random.Range(0, AllEnemyTag.Length)];
+            EnemyCardId = AllEnemyTag[Random.Range(0, AllEnemyTag.Length)];
         
-        senceSystem.BidingImageToObject(EnemyCard, EnemyCardId, true);//設定圖片
+            senceSystem.BidingImageToObject(EnemyCard, EnemyCardId, true);//設定圖片
 
-        EnemyCard.SetActive(true);
+            EnemyCard.SetActive(true);
+        }
+        else
+        {
+            string[] AllEnemyTag = new string[] { "defense", "damage", "scare" };
+
+            EnemyCardId = BossType;
+
+            SHS_BossCard_id = "";
+
+            EnemyCardId = AllEnemyTag[Random.Range(0, AllEnemyTag.Length)];
+        
+            senceSystem.BidingImageToObject(EnemyCard, EnemyCardId, true);//設定圖片
+
+            EnemyCard.SetActive(true);//打開圖片
+        }
 
     }
 
@@ -769,6 +925,16 @@ public class BattleMgr : MonoBehaviour
         senceSystem.LoadScene("s0");
     }
 
+    public void SHSUI(string n) //按鈕事件
+    {
+        SHS_BossCard_id = n; //強制更改
+    }
+    
+    public void beliefUI(string n) //按鈕事件
+    {
+        belief_PlaterCard_id = n; //強制更改
+    }
+    
     void Update()
     
     {
