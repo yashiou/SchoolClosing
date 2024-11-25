@@ -11,7 +11,7 @@ public class TitleMgr : MonoBehaviour
     
     [SerializeField]
     public GameObject ContinueButton;
-    
+
     // Start is called before the first frame update
     void Start()
     {
@@ -62,7 +62,23 @@ public class TitleMgr : MonoBehaviour
     { 
         playerseves.Loading();
     }
-    
+
+    public void Endless()
+    {
+        for (int i = 0; i < 7; i++)
+        {
+            senceSystem.CardBackpack.Add("advise_03");
+            
+            senceSystem.CardBackpack.Add("steadfast_08");
+
+            senceSystem.CardBackpack.Add("resist_15");
+
+            senceSystem.CardBackpack.Add("inspire_23");
+
+        }
+
+        InToGame("S1");
+    }
     // Update is called once per frame
     void Update()
     {
