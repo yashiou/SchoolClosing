@@ -82,9 +82,15 @@ public class BattleMgr : MonoBehaviour
     private string SHS_BossCard_id = ""; //強制指定敵人ID
     
     private string belief_PlaterCard_id = ""; //強制指定玩家ID
+
+    private RougeMgr rougeMgr;
+
+    private bool NowEnd; 
     
     void Start()
     {
+        rougeMgr = FindObjectOfType<RougeMgr>();
+        
         senceSystem = FindObjectOfType<SenceSystem>();
 
         animeMgr = FindObjectOfType<AnimeMgr>();
@@ -186,7 +192,7 @@ public class BattleMgr : MonoBehaviour
     } //洗牌
     public void UseCard(GameObject gameObject,string id, string replaceCardId)
     {
-        if (OnJudge)//審判中
+        if (OnJudge || NowEnd)//審判中
             return;
 
         Destroy(gameObject); //消失指定牌
@@ -538,7 +544,7 @@ public class BattleMgr : MonoBehaviour
 
                     break;
                 case "22"://深呼吸
-                    PlayerHealth.value += 5;
+                    PlayerDamage(-5);
                     break;
                 
                 case "23"://肌肉放鬆
@@ -831,39 +837,49 @@ public class BattleMgr : MonoBehaviour
         }
         if (BoossHealth.value == 0)
         {
-            
-            point += 100; //擊倒值+1
-
-            showpoint.text = $"分數:{point}"; //同步顯示
-            
-            animeMgr.EnemyDie();
-
-            await Task.Delay(1000); //因為無盡模式 要再次呼叫敵人
-            
-            animeMgr.CallNextEnemys();
-
-            DecreaseEffect(false);
-
-            PlayerData data = new PlayerData();
-
-            data.point = point; //分數紀錄
-
-            data.CardBackpack = senceSystem.CardBackpack; //紀錄卡堆
-
-            data.HandCard = HandCardId; //記錄手牌堆
-
-            data.UsedCard = UsedCard; //紀錄棄牌堆
-
-            data.PlayerHealth = PlayerHealth.value; //紀錄玩家血量
-
-            data.PlayerLife = PlayerLife; //紀錄玩家意志值
-
-            BoossAnger.value = BoossAnger.maxValue; //怒氣植回滿血
-
-            BoossHealth.value = PlayerHealth.maxValue; //存在植滿血
-
-            playerseves.Seve(data); //使用紀錄函數
+            PlayerWinEnd();
         }
+    }
+
+    public async void PlayerWinEnd() //玩家獲勝
+    {
+        NowEnd = true;
+        
+        point += 100; //擊倒值+1
+
+        showpoint.text = $"分數:{point}"; //同步顯示
+            
+        animeMgr.EnemyDie();
+
+        await Task.Delay(1000); //因為無盡模式 要再次呼叫敵人
+        
+        DecreaseEffect(false);
+
+        PlayerData data = new PlayerData();
+
+        data.point = point; //分數紀錄
+
+        data.CardBackpack = senceSystem.CardBackpack; //紀錄卡堆
+
+        data.HandCard = HandCardId; //記錄手牌堆
+
+        data.UsedCard = UsedCard; //紀錄棄牌堆
+
+        data.PlayerHealth = PlayerHealth.value; //紀錄玩家血量
+
+        data.PlayerLife = PlayerLife; //紀錄玩家意志值
+
+        BoossAnger.value = BoossAnger.maxValue; //怒氣植回滿血
+
+        BoossHealth.value = PlayerHealth.maxValue; //存在植滿血
+
+        playerseves.Seve(data); //使用紀錄函數
+        
+        rougeMgr.NewRound();
+
+        animeMgr.CallNextEnemys();
+        
+        NowEnd = false;
     }
 
     public async Task LoseGameEvent() //遊戲結束 失敗

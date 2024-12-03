@@ -165,9 +165,9 @@ public class Card : MonoBehaviour
 
     public void ToBattle()//卡牌不夠時顯示
     {
-        if (senceSystem.CardBackpack.Count < 21)
+        if (senceSystem.CardBackpack.Count < 28)
         {
-            ShowHint("牌數不夠21張!!!");
+            ShowHint("牌數不夠28張!!!");
         }
         else
         {
@@ -190,9 +190,9 @@ public class Card : MonoBehaviour
     public void CardEvent(string id)
     {
         int cardLimit = 0;
-        if (senceSystem.CardBackpack.Count >= 21)
+        if (senceSystem.CardBackpack.Count >= 28)
         {
-            ShowHint("牌數已達21張!");
+            ShowHint("牌數已達28張!");
                 
             return;
             
