@@ -5,6 +5,9 @@ using UnityEngine.UI;
 
 public class SettingMgr : MonoBehaviour
 {
+    [SerializeField] 
+    public GameObject settingUI;
+    
     [SerializeField]
     public AudieMusic audieMusic;
     
@@ -29,6 +32,18 @@ public class SettingMgr : MonoBehaviour
         AudioSlider.value = audieMusic.AudioSoundValue; 
 
         AllSoundSlider.value = audieMusic.AllSoundValue;
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (settingUI.activeInHierarchy)
+            {
+                settingUI.SetActive(false);
+            }
+            else
+            {
+                settingUI.SetActive(true);
+            }
+        }
     }
 
     public void MusicSoundChange() //改變音樂

@@ -11,7 +11,7 @@ public class RougeMgr : MonoBehaviour
 {
 
     [SerializeField]
-    public GameObject AdviseCard, SteadfastCard, ResistCard, InspireCard;
+    public GameObject Chose_Prefb  ;
 
     public SenceSystem senceSystem;
     
@@ -26,6 +26,11 @@ public class RougeMgr : MonoBehaviour
     public GameObject ChoseCardUI,Card_prefab,CardGrid; //選牌UI
 
     private string Chosed_Card_Id; //選擇牌
+
+    [SerializeField]
+    public BattleMgr battleMgr;
+
+    private List<GameObject> typeGameObject = new List<GameObject>();
     void Start()
     {
         senceSystem = FindAnyObjectByType<SenceSystem>();
@@ -47,66 +52,38 @@ public class RougeMgr : MonoBehaviour
 
     public void NewRound()
     {
+        for (int i = 0; i < typeGameObject.Count; i++)
+        {
+            Destroy(typeGameObject[i]);
+        }
+        typeGameObject.Clear();
+        
         RougeGameObject.SetActive(true);
-        
-        //抽選 advise 隨機牌
-        string RandomCard = categorized["advise"][Random.Range(0, categorized["advise"].Count)];
-        
-        //牌圖片賦予
-        senceSystem.BidingImageToObject(AdviseCard, RandomCard);
-        List<TextData> textData = senceSystem.CardText.TextFormat.Where(x => x.id == RandomCard.Split("_")[1] ).ToList();
 
-        AdviseCard.transform.GetChild(0).GetComponent<Text>().text = textData[0].Name;
-        
-        AdviseCard.transform.GetChild(0).GetComponent<Text>().text = textData[0].Effect;
-        
-        AdviseCard.GetComponent<Button>().onClick.AddListener(() => ToChange(textData[0].Name));
-        
-        AdviseCard.GetComponent<Button>().onClick.AddListener(() => ChoseCard());
-        
-        //抽選 Steadfast 隨機牌
-        RandomCard = categorized["steadfast"][Random.Range(0, categorized["steadfast"].Count)];
-        
-        //牌圖片賦予
-        senceSystem.BidingImageToObject(SteadfastCard, RandomCard);
-        
-        SteadfastCard.transform.GetChild(0).GetComponent<Text>().text = textData[0].Name;
-        
-        SteadfastCard.transform.GetChild(0).GetComponent<Text>().text = textData[0].Effect;
-        
-        SteadfastCard.GetComponent<Button>().onClick.AddListener(() => ToChange(textData[0].Name));
+        string[] AllCardTypes = {"advise", "steadfast", "resist", "inspire"};
 
-        SteadfastCard.GetComponent<Button>().onClick.AddListener(() => ChoseCard());
+        foreach (string card in AllCardTypes)
+        {
+            string RandomCard = categorized[card][Random.Range(0, categorized[card].Count)]; //找出分類隨機抽取
 
-        
-        //抽選 resist 隨機牌
-        RandomCard = categorized["resist"][Random.Range(0, categorized["resist"].Count)];
-        
-        //牌圖片賦予
-        senceSystem.BidingImageToObject(ResistCard, RandomCard);
-        
-        ResistCard.transform.GetChild(0).GetComponent<Text>().text = textData[0].Name;
-        
-        ResistCard.transform.GetChild(0).GetComponent<Text>().text = textData[0].Effect;
-        
-        ResistCard.GetComponent<Button>().onClick.AddListener(() => ToChange(textData[0].Name));
+            GameObject newCard = Instantiate(Chose_Prefb, Chose_Prefb.transform.parent); //生成卡牌
+            
+            senceSystem.BidingImageToObject(newCard, RandomCard); //將圖片賦予
+            
+            List<TextData> textData = senceSystem.CardText.TextFormat.Where(x => x.id == RandomCard.Split("_")[1] ).ToList();
 
-        ResistCard.GetComponent<Button>().onClick.AddListener(() => ChoseCard());
+            newCard.transform.GetChild(0).GetComponent<Text>().text = textData[0].Name; //綁名字文字
+            
+            newCard.transform.GetChild(1).GetComponent<Text>().text = textData[0].Effect;//綁效果文字
 
+            newCard.GetComponent<Button>().onClick.AddListener(() => ToChange(RandomCard));
         
-        //抽選 inspire 隨機牌
-        RandomCard = categorized["inspire"][Random.Range(0, categorized["inspire"].Count)];
-        
-        //牌圖片賦予
-        senceSystem.BidingImageToObject(InspireCard, RandomCard);
-        
-        InspireCard.transform.GetChild(0).GetComponent<Text>().text = textData[0].Name;
-        
-        InspireCard.transform.GetChild(0).GetComponent<Text>().text = textData[0].Effect;
-        
-        InspireCard.GetComponent<Button>().onClick.AddListener(() => ToChange(textData[0].Name));
-
-        InspireCard.GetComponent<Button>().onClick.AddListener(() => ChoseCard());
+            newCard.GetComponent<Button>().onClick.AddListener(() => ChoseCard());
+            
+            newCard.SetActive(true);
+            
+            typeGameObject.Add(newCard);
+        }
     }
 
     public void ChoseCard()
@@ -115,15 +92,31 @@ public class RougeMgr : MonoBehaviour
         {
             Destroy(ClearList[i]);
         }
+        
+        ClearList.Clear();
 
-        for (int i = 0; i < senceSystem.CardBackpack.Count; i++)
+        List<string> GetMycard = battleMgr.UsedCard.Concat(senceSystem.CardBackpack).ToList(); //合併所有排
+
+        List<string> Typecard = new List<string>();
+
+        foreach (string card in GetMycard) //檢查所有排
+        {
+            string type = card.Split("_")[0]; //找出前贅詞
+            
+            if (type == Chosed_Card_Id.Split("_")[0])
+            {
+                Typecard.Add(card);
+            }
+        }
+
+        for (int i = 0; i < Typecard.Count; i++)
         {
             GameObject Card = Instantiate(Card_prefab, CardGrid.transform);
 
-            Card.name = senceSystem.CardBackpack[i];
+            Card.name = Typecard[i];
             
-            senceSystem.BidingImageToObject(Card, senceSystem.CardBackpack[i]);
-            
+            senceSystem.BidingImageToObject(Card, Typecard[i]);
+
             Card.SetActive(true);
 
             Button Card_button = Card.GetComponent<Button>();
@@ -132,12 +125,14 @@ public class RougeMgr : MonoBehaviour
 
             Text Cardtext = Card.GetComponentInChildren<Text>();
 
+            Text CardEffect = Card.GetComponentInChildren<Text>();
             
             //根據ID找到所有符合條件的物件TextData物件 並整理成數據 交給.ToList()轉成陣列
             List<TextData> textData = senceSystem.CardText.TextFormat.Where(x => x.id == Card.name.Split("_")[1] ).ToList();
-
+            
             Cardtext.text = textData[0].Name;//給予名字
 
+            Cardtext.text = textData[0].Effect; //給予效果
             
             Card_button.onClick.AddListener(() => ChangeCard(Card.name));
 
@@ -155,13 +150,31 @@ public class RougeMgr : MonoBehaviour
     {
         for (int i = 0; i < senceSystem.CardBackpack.Count; i++)
         {
-            if (Chosed_Card_Id == id)
+            if (id == senceSystem.CardBackpack[i])
             {
                 senceSystem.CardBackpack[i] = Chosed_Card_Id;
+                
+                RougeGameObject.SetActive(false);
+        
+                ChoseCardUI.SetActive(false);
+            
+                return;
             }
         }
         
-        ChoseCardUI.transform.gameObject.SetActive(false);
+        for (int i = 0; i < battleMgr.UsedCard.Count; i++)
+        {
+            if (id == battleMgr.UsedCard[i])
+            {
+                battleMgr.UsedCard[i] = Chosed_Card_Id;
+                
+                RougeGameObject.SetActive(false);
+        
+                ChoseCardUI.SetActive(false);
+                
+                return;
+            }
+        }
     }
     
     void Update()

@@ -936,6 +936,11 @@ public class BattleMgr : MonoBehaviour
     void Update()
     
     {
-        
+        if (Input.GetKeyDown(KeyCode.K)) //必殺按鍵
+        {
+            BossGetDamage(100,true);
+            
+            BossGetDamage(100,false);
+        }
     }
 }
