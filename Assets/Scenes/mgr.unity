@@ -351,6 +351,7 @@ MonoBehaviour:
   AllCardIame: []
   EnemyCardIameg: []
   audieMusic: {fileID: 0}
+  state: 
 --- !u!1 &1436519847
 GameObject:
   m_ObjectHideFlags: 0

@@ -38,6 +38,15 @@ public class TitleMgr : MonoBehaviour
 
     public void InToGame(string name)
     {
+        if (name == "CardScene")
+        {
+            senceSystem.state = "free";
+        }
+        else
+        {
+            senceSystem.state = "endless";
+        }
+        
         senceSystem.LoadScene(name);
     }
 

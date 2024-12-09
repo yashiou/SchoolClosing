@@ -31,6 +31,9 @@ public class RougeMgr : MonoBehaviour
     public BattleMgr battleMgr;
 
     private List<GameObject> typeGameObject = new List<GameObject>();
+
+    [SerializeField]
+    public AnimeMgr animeMgr;
     void Start()
     {
         senceSystem = FindAnyObjectByType<SenceSystem>();
@@ -158,6 +161,8 @@ public class RougeMgr : MonoBehaviour
         
                 ChoseCardUI.SetActive(false);
             
+                animeMgr.CallNextEnemys();
+                
                 return;
             }
         }
@@ -172,9 +177,13 @@ public class RougeMgr : MonoBehaviour
         
                 ChoseCardUI.SetActive(false);
                 
+                animeMgr.CallNextEnemys();
+                
                 return;
             }
         }
+        
+        
     }
     
     void Update()

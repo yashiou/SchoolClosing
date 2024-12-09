@@ -458,7 +458,7 @@ public class BattleMgr : MonoBehaviour
             }
     } //敵人獲勝
 
-    public async void PlayerWin(string id)
+    public void PlayerWin(string id)
     {
         switch (id)
             {
@@ -822,7 +822,7 @@ public class BattleMgr : MonoBehaviour
         }
     }
     
-    public async void BossGetDamage(int value, bool isAnger) //敵人受傷
+    public void BossGetDamage(int value, bool isAnger) //敵人受傷
     {
         if (isAnger)
         {
@@ -875,14 +875,23 @@ public class BattleMgr : MonoBehaviour
 
         playerseves.Seve(data); //使用紀錄函數
         
-        rougeMgr.NewRound();
+        if (senceSystem.state != "free")
+        {
+            animeMgr.BackGroundMove();
+        }
+        
+        await Task.Delay(1000);
 
-        animeMgr.CallNextEnemys();
+        if (senceSystem.state != "free")
+        {
+            rougeMgr.NewRound();
+        }
+        
         
         NowEnd = false;
     }
 
-    public async Task LoseGameEvent() //遊戲結束 失敗
+    public async void LoseGameEvent() //遊戲結束 失敗
     {
         await Task.Delay(1000);
         

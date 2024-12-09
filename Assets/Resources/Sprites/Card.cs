@@ -47,8 +47,6 @@ public class Card : MonoBehaviour
         
         senceSystem = FindObjectOfType<SenceSystem>(); //從倉庫抓數據過來
 
-        string NowType = "";//初始化當前類型
-        
         int NowPage = -1;
         
 
@@ -89,6 +87,8 @@ public class Card : MonoBehaviour
             //根據ID找到所有符合條件的物件TextData物件 並整理成數據 交給.ToList()轉成陣列
             List<TextData> textData = senceSystem.CardText.TextFormat.Where(x => x.id == Card.name.Split("_")[1] ).ToList();
 
+            showcard.CardName = textData[0].Name;//名字
+            
             showcard.CardEffect = textData[0].Effect;//效果
             
             Cardtext.text = textData[0].Name;//給予名字

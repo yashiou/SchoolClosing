@@ -29,6 +29,8 @@ public class SenceSystem : MonoBehaviour //儲存牌組數據
 
     public AudieMusic audieMusic; //音樂管理員
 
+    public string state;
+
     
     private void Awake()
     {

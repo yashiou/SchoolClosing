@@ -45,6 +45,11 @@ public class Playerseves : MonoBehaviour
 
     public void Seve(PlayerData data) //存檔
     {
+        if (senceSystem.state == "free")
+        {
+            return;
+        }
+        
         string json = JsonUtility.ToJson(data);
         
         File.WriteAllText(filepath,json);

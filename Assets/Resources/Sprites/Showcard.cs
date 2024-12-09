@@ -16,6 +16,9 @@ public class Showcard : MonoBehaviour , IPointerEnterHandler ,IPointerExitHandle
 
     public string CardEffect; //顯示牌效果
 
+    public string CardName; //顯示名字
+    
+
     void Start()
     {
         ShowCardiamg = ShowBigImage.GetComponent<ShowCardIamg>();
@@ -59,7 +62,9 @@ public class Showcard : MonoBehaviour , IPointerEnterHandler ,IPointerExitHandle
 
         BigImageButton.onClick.AddListener(()=> ShowBigImage.SetActive(false)); //關閉大圖
 
-        ShowBigImage.GetComponentInChildren<Text>().text = CardEffect; //修改大圖文字
+        ShowBigImage.transform.GetChild(2).GetComponent<Text>().text = CardEffect; //修改大圖文字
+        
+        ShowBigImage.transform.GetChild(1).GetComponent<Text>().text = CardName;
         
         ShowBigImage.SetActive(true);
 

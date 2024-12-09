@@ -13,6 +13,9 @@ public class AnimeMgr : MonoBehaviour
 
     private GameObject NowEnemy; //當前的敵人
 
+    [SerializeField] 
+    public GameObject BackGround;
+
     public void CallNextEnemys()
     {
         NowEnemy = Enemys[NowEnemyIndex];
@@ -32,7 +35,11 @@ public class AnimeMgr : MonoBehaviour
         
         NowEnemy.SetActive(false);
     }
-    
+
+    public void BackGroundMove()
+    {
+        BackGround.GetComponent<Animator>().SetTrigger("MOVE");
+    }
     void Start()
     {
         
