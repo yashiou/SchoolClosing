@@ -87,6 +87,11 @@ public class BattleMgr : MonoBehaviour
 
     private bool NowEnd; 
     
+    [SerializeField]
+    public Slider Hope; //希望值
+
+    public Slider BossHope; //對手希望值
+    
     void Start()
     {
         rougeMgr = FindObjectOfType<RougeMgr>();
@@ -100,6 +105,7 @@ public class BattleMgr : MonoBehaviour
         playerseves = FindObjectOfType<Playerseves>();
         
         Initial(); //重設值
+        
     }//起始
 
     public async void Initial()
@@ -214,6 +220,12 @@ public class BattleMgr : MonoBehaviour
             BossChooseCard(SHS_BossCard_id); //對手丟牌
         }
 
+        BossHope.value = Random.Range(0,100);
+        
+        Hope.value += Random.Range(10,20);
+        
+        CheckCard(id);
+        
         judgeSystem();
         
         
@@ -247,6 +259,8 @@ public class BattleMgr : MonoBehaviour
         
         
     } //賦予效果
+
+    
 
     //public void UseEffect(bool Open, string terEffect = "")//使用後移除效果 如果是移除要指定
     //{
@@ -358,10 +372,10 @@ public class BattleMgr : MonoBehaviour
                     break;
                 case "10" :
                     break;
-                case "11": //小雨傘
+                case "11":
                     EffectAndCount["avoid"] = 2; //打開迴避效果
                     break;
-                case "12" : //應激
+                case "12" :
                     EffectAndCount["counterattack"] = 2; //打開反擊效果
                     break;
                 case "13": 
@@ -487,8 +501,34 @@ public class BattleMgr : MonoBehaviour
 
                     PlayerHealth.value -= 10;
                     break;
-                case "08"://格檔
+                case "15": //振奮
+                    BossGetDamage(10, false);
                     break;
+                case "16"://自我信任
+                    BossGetDamage(15, false);
+                    break;
+                case "19":
+                    BossGetDamage(10, false);
+
+                    GetEffect(PlayrEffectBar, "protect"); //給予Boss自我保護負面效果
+                    break;
+                case "20": //反抗
+                    BossGetDamage(10, false);
+                    
+                    break;
+                case "21"://箝制
+                    BossGetDamage(15, false);
+
+                    break;
+                default:
+                    break;
+            }
+    } //玩家獲勝
+
+    public void CheckCard(string id)
+    {
+        switch (id)
+            {
                 case "09"://替換
                     if (HandCardId.Count > 0)
                     {
@@ -506,23 +546,13 @@ public class BattleMgr : MonoBehaviour
                     break;
                 case "10": //小雨傘
                     GetEffect(PlayrEffectBar,"firm"); //給予玩家堅定效果
-
-                    break;
-                case "11":
-                    break;
-                case "12":
                     break;
                 case "13": //危機意識
                     EffectAndCount["KnowBossCard"] = 2;
                     break;
                 case "14": //蜷縮
+                    GetEffect(PlayrEffectBar,"block");
                     PlayerHealth.value += 5;
-                    break;
-                case "15": //振奮
-                    BossGetDamage(10, false);
-                    break;
-                case "16"://自我信任
-                    BossGetDamage(15, false);
                     break;
                 case "17"://稟告
                     GetEffect(PlayrEffectBar,"report"); //給予玩家稟告效果
@@ -530,23 +560,9 @@ public class BattleMgr : MonoBehaviour
                 case "18":
                     GetEffect(PlayrEffectBar, "cheer"); //給予玩家自我打氣效果
                     break;
-                case "19":
-                    BossGetDamage(10, false);
-
-                    GetEffect(PlayrEffectBar, "protect"); //給予Boss自我保護負面效果
-                    break;
-                case "20": //反抗
-                    BossGetDamage(10, false);
-                    
-                    break;
-                case "21"://箝制
-                    BossGetDamage(15, false);
-
-                    break;
                 case "22"://深呼吸
                     PlayerDamage(-5);
                     break;
-                
                 case "23"://肌肉放鬆
                     GetEffect(PlayrEffectBar, "block"); //給予玩家格檔傷害效果
                     break;
@@ -582,7 +598,7 @@ public class BattleMgr : MonoBehaviour
                 default:
                     break;
             }
-    } //玩家獲勝
+    }
     
     public int WhoWin()
     {
@@ -605,7 +621,18 @@ public class BattleMgr : MonoBehaviour
             belief_PlaterCard_id = "";
         }
 
-        if (PlayerType == "advise") //勸導
+        if (Hope.value > BossHope.value)
+        {
+            result.text = "勝";
+                
+            WinOrLose = 1;
+        }
+        else
+        {
+            result.text = "敗";
+            WinOrLose = 0;
+        }
+        /*if (PlayerType == "advise") //勸導
         {
             if (EnemyTyoe == "defense") //防禦
             {
@@ -717,7 +744,7 @@ public class BattleMgr : MonoBehaviour
                 WinOrLose = 0;
 
             }
-        }
+        }*/
 
         if(WinOrLose ==0 && EffectAndCount["protect"] > 0) //當具有自我保護效果時輸掉時 改成平手
         {
@@ -759,6 +786,8 @@ public class BattleMgr : MonoBehaviour
         PlayerHealth.value -= value;
 
         PlayerHealthText.text = PlayerHealth.value.ToString() + "%";
+        
+        Hope.value += Random.Range(5,10);
         
         if (PlayerHealth.value == 0) //當玩家沒血
         {
@@ -826,12 +855,21 @@ public class BattleMgr : MonoBehaviour
     {
         if (isAnger)
         {
+            if (BoossAnger.value > 0)
+            {
+                Hope.value = 0;
+            }
             BoossAnger.value -= value;
         }
         else
         {
             if (BoossAnger.value <=0)
             {
+                if (BoossHealth.value > 0)
+                {
+                    Hope.value = 0;
+                }
+                
                 BoossHealth.value -= value;
             }
         }
