@@ -24,6 +24,19 @@ public class PlayerData
 
     public int PlayerLife = 0;
 
+    public int UesPlayCard;//總打牌數
+    
+    public int PlayerWins; //總獲勝數
+    
+    public int AllPoint; //總分
+
+    public float 
+        Rebirth,
+        Life,
+        EnergyUp,
+        EnergyMp,
+        KnockDw,
+        Totalscore;
 }
 public class Playerseves : MonoBehaviour
 {
@@ -45,6 +58,8 @@ public class Playerseves : MonoBehaviour
 
     public void Seve(PlayerData data) //存檔
     {
+        
+        
         if (senceSystem.state == "free")
         {
             return;

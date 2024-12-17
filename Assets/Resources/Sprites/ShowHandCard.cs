@@ -11,7 +11,7 @@ public class ShowHandCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     private RectTransform reetTransform;
 
 
-    private float offset = 10;
+    private float offset = 30;
 
     private Image myImage; //此卡圖片
 

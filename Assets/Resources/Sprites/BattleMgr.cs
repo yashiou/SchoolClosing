@@ -39,7 +39,7 @@ public class BattleMgr : MonoBehaviour
     [SerializeField] 
     public List<GameObject> AllEffect = new List<GameObject>(); //所有效果
 
-    public int PlayerLife = 3; //玩家生命
+    public int PlayerLife = 0; //玩家生命
 
     public int point = 0; //擊倒敵人數
 
@@ -92,6 +92,18 @@ public class BattleMgr : MonoBehaviour
 
     public Slider BossHope; //對手希望值
     
+    private int UesPlayCards;//總打牌數
+    
+    private int PlayerWinss; //總獲勝數
+    
+    private int AllPoints; //總分
+    
+    public float 
+        EnergyMpss,
+        KnockDwss,
+        Totalscoress;
+
+    public GameObject LoseGameUI;
     void Start()
     {
         rougeMgr = FindObjectOfType<RougeMgr>();
@@ -110,6 +122,22 @@ public class BattleMgr : MonoBehaviour
 
     public async void Initial()
     {
+        PlayerData playerData = playerseves.Load();
+
+        PlayerLife = (int)playerData.Rebirth;
+
+        PlayerHealth.maxValue += playerData.Life;
+
+        PlayerHealth.value = PlayerHealth.maxValue;
+
+        Hope.maxValue += playerData.EnergyUp;
+
+        EnergyMpss = 1 + playerData.EnergyMp; //能量倍率
+
+        KnockDwss = 1 + playerData.KnockDw; //敵人倍率
+
+        Totalscoress = 1 + playerData.Totalscore; //分數倍率
+        
         await Task.Delay(750);
 
         for (int i = 0; i < PlayerLife; i++)
@@ -132,6 +160,9 @@ public class BattleMgr : MonoBehaviour
         {
             GetCard();
         }
+
+        
+
     }
     public void GetCard(string TargetId = "", string repleseCardId = "")
     {
@@ -222,7 +253,7 @@ public class BattleMgr : MonoBehaviour
 
         BossHope.value = Random.Range(0,100);
         
-        Hope.value += Random.Range(10,20);
+        Hope.value += Random.Range(10,20) * EnergyMpss;
         
         CheckCard(id);
         
@@ -239,6 +270,8 @@ public class BattleMgr : MonoBehaviour
         }
         senceSystem.CardBackpack.Remove(id); //移除指定的卡
         CardStack.transform.GetChild(0).GetComponent<Text>().text = senceSystem.CardBackpack.Count.ToString(); //卡牌數
+
+        UesPlayCards += 1;
     } //使用牌
 
     public void GetEffect(GameObject who, string Effect) //效果賦予
@@ -474,6 +507,8 @@ public class BattleMgr : MonoBehaviour
 
     public void PlayerWin(string id)
     {
+        PlayerWinss += 1;
+        
         switch (id)
             {
                 case "01": //唯一的的方法
@@ -787,7 +822,7 @@ public class BattleMgr : MonoBehaviour
 
         PlayerHealthText.text = PlayerHealth.value.ToString() + "%";
         
-        Hope.value += Random.Range(5,10);
+        Hope.value += Random.Range(5,10) * EnergyMpss;
         
         if (PlayerHealth.value == 0) //當玩家沒血
         {
@@ -883,7 +918,7 @@ public class BattleMgr : MonoBehaviour
     {
         NowEnd = true;
         
-        point += 100; //擊倒值+1
+        point += 1; //擊倒值+1
 
         showpoint.text = $"分數:{point}"; //同步顯示
             
@@ -895,6 +930,10 @@ public class BattleMgr : MonoBehaviour
 
         PlayerData data = new PlayerData();
 
+        data.UesPlayCard = UesPlayCards;
+
+        data.PlayerWins = PlayerWinss;
+        
         data.point = point; //分數紀錄
 
         data.CardBackpack = senceSystem.CardBackpack; //紀錄卡堆
@@ -926,14 +965,34 @@ public class BattleMgr : MonoBehaviour
         }
         
         
+        
         NowEnd = false;
     }
 
-    public async void LoseGameEvent() //遊戲結束 失敗
+    public void LoseGameEvent() //遊戲結束 失敗
     {
-        await Task.Delay(1000);
+        AllPoints = (int)(((point * 100 * KnockDwss) + UesPlayCards + PlayerWinss * 5) * Totalscoress);
+
+        PlayerData data = playerseves.Load();
+
+        if (data == null)
+        {
+            data = new PlayerData();
+        }
         
-        senceSystem.LoadScene("s0");
+        data.AllPoint += AllPoints;
+        
+        playerseves.Seve(data);
+
+        LoseGameUI.transform.GetChild(0).GetChild(0).GetComponent<Text>().text = point.ToString();
+        
+        LoseGameUI.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = UesPlayCards.ToString();
+
+        LoseGameUI.transform.GetChild(2).GetChild(0).GetComponent<Text>().text = PlayerWinss.ToString();
+
+        LoseGameUI.transform.GetChild(3).GetChild(0).GetComponent<Text>().text = AllPoints.ToString();
+        
+        LoseGameUI.transform.parent.gameObject.SetActive(true);
     }
     
     public void BossChooseCard(string BossType = "")
