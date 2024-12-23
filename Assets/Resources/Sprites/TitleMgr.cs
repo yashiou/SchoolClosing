@@ -21,7 +21,7 @@ public class TitleMgr : MonoBehaviour
 
         playerseves = FindAnyObjectByType<Playerseves>(); 
 
-        if (playerseves.Load() ==null)
+        if (playerseves.Load().HandCard.Count <= 0)
         {
             ContinueButton.GetComponent<Image>().color = Color.gray; //按鈕便灰色
             

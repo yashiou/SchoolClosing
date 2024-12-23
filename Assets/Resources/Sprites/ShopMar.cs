@@ -24,7 +24,27 @@ public class ShopMar : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        _playerseves = FindFirstObjectByType<Playerseves>();
+        _playerseves = FindAnyObjectByType<Playerseves>();
+
+        _playerData = _playerseves.Load();
+
+        if (_playerData == null)
+        {
+            _playerData = new PlayerData();
+        }
+        EXP.text = _playerData.AllPoint.ToString();
+
+        Rebirths.value = _playerData.Rebirth;
+
+        Lifes.value = _playerData.Life;
+
+        EnergyUps.value = _playerData.EnergyUp;
+
+        EnergyMps.value = _playerData.EnergyMp * 10;
+
+        KnockDws.value = _playerData.KnockDw * 10;
+
+        Totalscores.value = _playerData.Totalscore * 10;
     }
     
     
@@ -36,7 +56,7 @@ public class ShopMar : MonoBehaviour
             case 0 :
                 if ( _playerData.AllPoint >= 200 && Rebirths.value < Rebirths.maxValue)
                 {
-                    _playerData.AllPoint -= 200;
+                    ShopCost(-200);
 
                     _playerData.Rebirth += 1;
 
@@ -47,7 +67,7 @@ public class ShopMar : MonoBehaviour
             case 1 :
                 if ( _playerData.AllPoint >= 100 && Lifes.value < Lifes.maxValue)
                 {
-                    _playerData.AllPoint -= 100;
+                    ShopCost(-100);
 
                     _playerData.Life += 1;
 
@@ -58,7 +78,7 @@ public class ShopMar : MonoBehaviour
             case 2 :
                 if ( _playerData.AllPoint >= 50 && EnergyUps.value < EnergyUps.maxValue)
                 {
-                    _playerData.AllPoint -= 50;
+                    ShopCost(-50);
 
                     _playerData.EnergyUp += 1;
 
@@ -69,7 +89,7 @@ public class ShopMar : MonoBehaviour
             case 3 :
                 if ( _playerData.AllPoint >= 100 && EnergyMps.value < EnergyMps.maxValue)
                 {
-                    _playerData.AllPoint -= 100;
+                    ShopCost(-100);
 
                     _playerData.EnergyMp += 0.1f;
 
@@ -80,7 +100,7 @@ public class ShopMar : MonoBehaviour
             case 4 :
                 if ( _playerData.AllPoint >= 300 && KnockDws.value < KnockDws.maxValue)
                 {
-                    _playerData.AllPoint -= 300;
+                    ShopCost(-300);
 
                     _playerData.KnockDw += 0.1f;
 
@@ -91,7 +111,7 @@ public class ShopMar : MonoBehaviour
             case 5 :
                 if ( _playerData.AllPoint >= 600 && Totalscores.value < Totalscores.maxValue)
                 {
-                    _playerData.AllPoint -= 600;
+                    ShopCost(-600);
 
                     _playerData.Totalscore += 0.1f;
 
@@ -103,15 +123,10 @@ public class ShopMar : MonoBehaviour
         }
         _playerseves.Seve(_playerData);
     }
-    
-    private void OnEnable()
+    private void ShopCost(int coint)
     {
-        _playerData = _playerseves.Load();
+        _playerData.AllPoint += coint;
 
-        if (_playerData == null)
-        {
-            _playerData = new PlayerData();
-        }
         EXP.text = _playerData.AllPoint.ToString();
     }
 }

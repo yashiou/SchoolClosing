@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using Task = System.Threading.Tasks.Task;
@@ -104,6 +105,9 @@ public class BattleMgr : MonoBehaviour
         Totalscoress;
 
     public GameObject LoseGameUI;
+
+    public SettingMgr settingMgr;
+
     void Start()
     {
         rougeMgr = FindObjectOfType<RougeMgr>();
@@ -126,11 +130,13 @@ public class BattleMgr : MonoBehaviour
 
         PlayerLife = (int)playerData.Rebirth;
 
-        PlayerHealth.maxValue += playerData.Life;
+        PlayerHealth.maxValue += playerData.Life * 10;
 
         PlayerHealth.value = PlayerHealth.maxValue;
 
-        Hope.maxValue += playerData.EnergyUp;
+        PlayerHealthText.text = PlayerHealth.value.ToString() + "%";
+
+        Hope.maxValue += playerData.EnergyUp * 10;
 
         EnergyMpss = 1 + playerData.EnergyMp; //能量倍率
 
@@ -239,17 +245,6 @@ public class BattleMgr : MonoBehaviour
         HandCardId.Remove(id); //移除手牌堆
         
         senceSystem.BidingImageToObject(PlayrCard, PlayrCardId); // 設定圖片
-        
-        PlayrCard.SetActive(true);
-
-        if (EffectAndCount["KnowBossCard"] == 0)//當沒有中預測牌效果在丟牌
-        {
-            BossChooseCard(); //對手丟牌
-        }
-        else if (SHS_BossCard_id != "")
-        {
-            BossChooseCard(SHS_BossCard_id); //對手丟牌
-        }
 
         BossHope.value = Random.Range(0,100);
         
@@ -308,28 +303,7 @@ public class BattleMgr : MonoBehaviour
 
         //UseEffect(true);//處發效果
         int WinOrLose = WhoWin(); //1是勝利2是平手0是敗
-        
-        await Task.Delay(500);//等待0.5秒
-        
-        result.gameObject.SetActive(true);
 
-        await Task.Delay(2000);//等待兩秒
-        
-        result.gameObject.SetActive(false);
-        
-        if (EffectAndCount["adrenaline"] > 0)
-        {
-            result.text = "觸發腎上腺素效果";
-                    
-            BossGetDamage(15,false);//-15存在
-                    
-            result.gameObject.SetActive(true);
-                    
-            await Task.Delay(1000);//等待兩秒
-            
-            result.gameObject.SetActive(false);
-        }
-        
         if (WinOrLose == 1) //成功時
         {
             PlayerWin(CardIdNumber);
@@ -345,6 +319,13 @@ public class BattleMgr : MonoBehaviour
                 BossGetDamage(20, false);
             }
         }
+
+        result.gameObject.SetActive(true);
+
+        await Task.Delay(1000);//等待兩秒
+
+        result.gameObject.SetActive(false);
+        
         PlayrCard.SetActive(false);
         
         EnemyCard.SetActive(false);
@@ -382,127 +363,117 @@ public class BattleMgr : MonoBehaviour
     {
         string EnemyTyoe = EnemyCardId.Split("_")[0];
         switch (id)
-            {
-                case "01" :
-                    BossGetDamage(75, true); //失敗時減少75怨恨
-                    break;
-                case "02" :
+        {
+            case "01" :
+                BossGetDamage(75, true); //失敗時減少75怨恨
+                break;
+            case "02" :
                     
-                    break;
-                case "03":
-                    break;
-                case "04" :
-                    break;
-                case "05":
-                    break;
-                case "06" :
-                    break;
-                case "07":
-                    break;
-                case "08" :
-                    break;
-                case "09":
-                    break;
-                case "10" :
-                    break;
-                case "11":
-                    EffectAndCount["avoid"] = 2; //打開迴避效果
-                    break;
-                case "12" :
-                    EffectAndCount["counterattack"] = 2; //打開反擊效果
-                    break;
-                case "13": 
-                    break;
-                case "14" :
-                    break;
-                case "15":
-                    break;
-                case "16" :
-                    break;
-                case "17":
-                    break;
-                case "18" :
-                    break;
-                case "19":
-                    break;
-                case "20" :
-                    break;
-                case "21":
-                    break;
-                default: 
-                    break;
-            }
-            if (EffectAndCount["avoid"] > 0)
-            {
-                result.text = "觸發迴避效果";
-                
-                result.gameObject.SetActive(true);
+                break;
+            case "03":
+                break;
+            case "04" :
+                break;
+            case "05":
+                break;
+            case "06" :
+                break;
+            case "07":
+                break;
+            case "08" :
+            result.text = "格擋";
+            return;
+            case "09":
+                break;
+            case "10" :
+                break;
+            case "11":
+            result.text = "迴避傷害";
+            return;
+            case "12" :
 
-                await Task.Delay(1000);//等待秒
-        
-                result.gameObject.SetActive(false);
-            }
-            else if (EffectAndCount["counterattack"] > 0)
+            if (EnemyTyoe == "damage") //7~13傷害
             {
-                result.text = "觸發反擊效果";
-                
-                result.gameObject.SetActive(true);
+                if (BoossAnger.value > 0)
+                {
+                    BossGetDamage(10, true); 
+                }
+                else
+                {
+                    BossGetDamage(10, false);
+                }
+                result.text = "反擊傷害";
+            }
+            else if (EnemyTyoe == "scare")//14~20驚嚇
+            {
+                if (BoossAnger.value > 0)
+                {
+                    BossGetDamage(5, true);
+                }
+                else
+                {
+                    BossGetDamage(5, false);
+                }
+                result.text = "反擊傷害";
+            }
+            return;
+        case "13": 
+            break;
+        case "14" :
+        result.text = "格擋";
+        return;
+        case "15":
+            break;
+        case "16" :
+            break;
+        case "17":
+            break;
+        case "18" :
+            break;
+        case "19":
+            break;
+        case "20" :
+            break;
+        case "21":
+            break;
+        case "23":
+            result.text = "格擋";
+            return;
+        case "24":
+            result.text = "轉變傷害";
 
-                BossGetDamage(5, true);
+        if (EnemyTyoe == "damage") //7~13傷害
+        {
+            PlayerDamage(-10); //增加san值
+        }
+        else if (EnemyTyoe == "scare")//14~20驚嚇
+        {
+            PlayerDamage(-5); //增加san值
+        }
+        return;
+        default: 
+            break;
+        }
+        if (EnemyTyoe == "defense") //0~6防禦
+        {
+        result.text = "敵人觀察中";
+        }
+        else if (EnemyTyoe == "damage") //7~13傷害
+        {
+            result.text = "敵人剝奪了你10存在";
+            PlayerDamage(10); //減少san值
+        }
+        else if (EnemyTyoe == "scare")//14~20驚嚇
+        {
+            result.text = "敵人剝奪了你5存在";
+            PlayerDamage(5); //減少san值
 
-                await Task.Delay(1000);//等待兩秒
-        
-                result.gameObject.SetActive(false);
-            }
-            else if (EffectAndCount["block"] > 0)
-            {
-                result.text = "觸發格檔傷害效果";
-                
-                result.gameObject.SetActive(true);
-                
-                await Task.Delay(1000);//等待兩秒
-        
-                result.gameObject.SetActive(false);
-            }
-            else if (EffectAndCount["recover"] > 0)
-            {
-                result.text = "觸發轉變傷害效果";
-                
-                if(EnemyTyoe == "damage") //7~13傷害
-                {
-                    PlayerDamage(-10); //增加san值
-                }
-                else if (EnemyTyoe == "scare")//14~20驚嚇
-                {
-                    PlayerDamage(-5); //增加san值
-                }
-                
-                result.gameObject.SetActive(true);
-                
-                await Task.Delay(1000);//等待兩秒
-        
-                result.gameObject.SetActive(false);
-            }
-            else
-            {
-                if (EnemyTyoe == "defense") //0~6防禦
-                {
-                
-                }
-                else if(EnemyTyoe == "damage") //7~13傷害
-                {
-                    PlayerDamage(10); //減少san值
-                }
-                else if (EnemyTyoe == "scare")//14~20驚嚇
-                {
-                    PlayerDamage(5); //減少san值
-                    
-                }
-                else if (EnemyTyoe == "enhance")//強化
-                {
-                    BoossHealth.value += 10;//回復牌
-                }
-            }
+        }
+        else if (EnemyTyoe == "enhance")//強化
+        {
+            result.text = "敵人回復了10存在";
+            BoossHealth.value += 10;//回復牌
+        }
     } //敵人獲勝
 
     public void PlayerWin(string id)
@@ -639,15 +610,6 @@ public class BattleMgr : MonoBehaviour
     {
         int WinOrLose = 2; //1是勝利2是平手0是敗
         string PlayerType = PlayrCardId.Split("_")[0]; //玩家的牌分類 
-
-        string EnemyTyoe = EnemyCardId.Split("_")[0]; //敵人的牌分類
-        
-        if (SHS_BossCard_id != "")
-        {
-            EnemyTyoe = SHS_BossCard_id;
-
-            SHS_BossCard_id = "";
-        }
         
         if (belief_PlaterCard_id != "")
         {
@@ -658,14 +620,18 @@ public class BattleMgr : MonoBehaviour
 
         if (Hope.value > BossHope.value)
         {
-            result.text = "勝";
+            PlayrCard.SetActive(true);
+
+            result.text = "";
                 
             WinOrLose = 1;
         }
         else
         {
-            result.text = "敗";
+            result.text = "";
             WinOrLose = 0;
+
+            BossChooseCard(); //對手丟牌
         }
         /*if (PlayerType == "advise") //勸導
         {
@@ -818,6 +784,7 @@ public class BattleMgr : MonoBehaviour
 
     public void PlayerDamage(int value) //玩家受到傷害
     {
+
         PlayerHealth.value -= value;
 
         PlayerHealthText.text = PlayerHealth.value.ToString() + "%";
@@ -867,7 +834,7 @@ public class BattleMgr : MonoBehaviour
             }
             
             if(EffectAndCount[s] == 0 && //當玩家或敵人有效果 
-               (PlayrEffectBar.transform.childCount > 0 || BoossHealth.transform.childCount > 0))
+                (PlayrEffectBar.transform.childCount > 0 || BoossHealth.transform.childCount > 0))
             {
                 Transform DelEffect = PlayrEffectBar.transform.Find(s); //找到對應的效果
                 
@@ -893,6 +860,12 @@ public class BattleMgr : MonoBehaviour
             if (BoossAnger.value > 0)
             {
                 Hope.value = 0;
+
+                result.text = "命中";
+            }
+            else
+            {
+                result.text = "無效";
             }
             BoossAnger.value -= value;
         }
@@ -903,15 +876,22 @@ public class BattleMgr : MonoBehaviour
                 if (BoossHealth.value > 0)
                 {
                     Hope.value = 0;
+
+                    result.text = "命中";
                 }
-                
                 BoossHealth.value -= value;
+            }
+            else
+            {
+                result.text = "無效";
             }
         }
         if (BoossHealth.value == 0)
         {
             PlayerWinEnd();
         }
+
+
     }
 
     public async void PlayerWinEnd() //玩家獲勝
@@ -928,7 +908,7 @@ public class BattleMgr : MonoBehaviour
         
         DecreaseEffect(false);
 
-        PlayerData data = new PlayerData();
+        PlayerData data = playerseves.Load();
 
         data.UesPlayCard = UesPlayCards;
 
@@ -975,13 +955,12 @@ public class BattleMgr : MonoBehaviour
 
         PlayerData data = playerseves.Load();
 
-        if (data == null)
-        {
-            data = new PlayerData();
-        }
-        
+        data.HandCard.Clear();
+
         data.AllPoint += AllPoints;
-        
+
+        senceSystem.CardBackpack.Clear();
+
         playerseves.Seve(data);
 
         LoseGameUI.transform.GetChild(0).GetChild(0).GetComponent<Text>().text = point.ToString();
@@ -1042,11 +1021,23 @@ public class BattleMgr : MonoBehaviour
     void Update()
     
     {
-        if (Input.GetKeyDown(KeyCode.K)) //必殺按鍵
+        if(Input.GetKeyDown(KeyCode.Escape)) //設定
+        {
+            settingMgr.gameObject.SetActive(!settingMgr.gameObject.activeInHierarchy);
+        }
+
+        /*if (Input.GetKeyDown(KeyCode.K)) //必殺按鍵
         {
             BossGetDamage(100,true);
             
             BossGetDamage(100,false);
         }
+
+        if (Input.GetKeyDown(KeyCode.L)) //必殺按鍵
+        {
+            PlayerDamage(1000);
+
+            PlayerDamage(1000);
+        }*/
     }
 }

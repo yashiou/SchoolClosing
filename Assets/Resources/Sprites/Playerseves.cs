@@ -54,6 +54,11 @@ public class Playerseves : MonoBehaviour
         senceSystem = FindAnyObjectByType<SenceSystem>();
 
         filepath = Path.Combine(Application.persistentDataPath, "PlayerData.json"); //預設路徑
+    
+        if (Load() == null)
+        {
+            Seve(new PlayerData());
+        }
     }
 
     public void Seve(PlayerData data) //存檔
