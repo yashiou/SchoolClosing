@@ -1,8 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
-using UnityEditor.U2D.Aseprite;
-using UnityEditor.VersionControl;
 using UnityEngine;
 using UnityEngine.UI;
 using Task = System.Threading.Tasks.Task;

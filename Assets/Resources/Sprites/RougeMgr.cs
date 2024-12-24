@@ -2,8 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-using System.Net.Mime;
-using Microsoft.Unity.VisualStudio.Editor;
 using UnityEngine.UI;
 
 public class RougeMgr : MonoBehaviour
