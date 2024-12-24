@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEngine.EventSystems.EventTrigger;
 
 public class ShopMar : MonoBehaviour
 {
@@ -45,6 +46,48 @@ public class ShopMar : MonoBehaviour
         KnockDws.value = _playerData.KnockDw * 10;
 
         Totalscores.value = _playerData.Totalscore * 10;
+
+        Rebirths.GetComponentInChildren<Text>().text = (200 * (int)(Rebirths.value + 1)).ToString();
+
+        if (Rebirths.value == Rebirths.maxValue)
+        {
+            Rebirths.GetComponentInChildren<Text>().gameObject.SetActive(false);
+        }
+
+        Lifes.GetComponentInChildren<Text>().text = (100 * (int)(Lifes.value + 1)).ToString();
+
+        if (Lifes.value == Lifes.maxValue)
+        {
+            Lifes.GetComponentInChildren<Text>().gameObject.SetActive(false);
+        }
+
+        EnergyUps.GetComponentInChildren<Text>().text = (50 * (int)(EnergyUps.value + 1)).ToString();
+
+        if (EnergyUps.value == EnergyUps.maxValue)
+        {
+            EnergyUps.GetComponentInChildren<Text>().gameObject.SetActive(false);
+        }
+
+        EnergyMps.GetComponentInChildren<Text>().text = (100 * (int)(EnergyMps.value + 1)).ToString();
+
+        if (EnergyMps.value == EnergyMps.maxValue)
+        {
+            EnergyMps.GetComponentInChildren<Text>().gameObject.SetActive(false);
+        }
+
+        KnockDws.GetComponentInChildren<Text>().text = (300 * (int)(KnockDws.value + 1)).ToString();
+
+        if (KnockDws.value == KnockDws.maxValue)
+        {
+            KnockDws.GetComponentInChildren<Text>().gameObject.SetActive(false);
+        }
+
+        Totalscores.GetComponentInChildren<Text>().text = (600 * (int)(Totalscores.value + 1)).ToString();
+
+        if (Totalscores.value == Totalscores.maxValue)
+        {
+            Totalscores.GetComponentInChildren<Text>().gameObject.SetActive(false);
+        }
     }
     
     
@@ -54,68 +97,110 @@ public class ShopMar : MonoBehaviour
         switch (id)
         {
             case 0 :
-                if ( _playerData.AllPoint >= 200 && Rebirths.value < Rebirths.maxValue)
+                if ( _playerData.AllPoint >= 200 * (Rebirths.value + 1) && Rebirths.value < Rebirths.maxValue)
                 {
-                    ShopCost(-200);
+                    ShopCost(-200 * (int)(Rebirths.value + 1));
 
                     _playerData.Rebirth += 1;
 
                     Rebirths.value += 1;
+
+                    Rebirths.GetComponentInChildren<Text>().text = (200 * (int)(Rebirths.value + 1)).ToString();
+
+                    if (Rebirths.value == Rebirths.maxValue)
+                    {
+                        Rebirths.GetComponentInChildren<Text>().gameObject.SetActive(false);
+                    }
                 }
                 break;
             
             case 1 :
-                if ( _playerData.AllPoint >= 100 && Lifes.value < Lifes.maxValue)
+                if ( _playerData.AllPoint >= 100 * (int)(Lifes.value + 1) && Lifes.value < Lifes.maxValue)
                 {
-                    ShopCost(-100);
+                    ShopCost(-100 * (int)(Lifes.value + 1));
 
                     _playerData.Life += 1;
 
                     Lifes.value += 1;
+
+                    Lifes.GetComponentInChildren<Text>().text = (100 * (int)(Lifes.value + 1)).ToString();
+
+                    if (Lifes.value == Lifes.maxValue)
+                    {
+                        Lifes.GetComponentInChildren<Text>().gameObject.SetActive(false);
+                    }
                 }
                 break;
             
             case 2 :
-                if ( _playerData.AllPoint >= 50 && EnergyUps.value < EnergyUps.maxValue)
+                if ( _playerData.AllPoint >= 50 * (int)(EnergyUps.value + 1) && EnergyUps.value < EnergyUps.maxValue)
                 {
-                    ShopCost(-50);
+                    ShopCost(-50 * (int)(EnergyUps.value + 1));
 
                     _playerData.EnergyUp += 1;
 
                     EnergyUps.value += 1;
+
+                    EnergyUps.GetComponentInChildren<Text>().text = (50 * (int)(EnergyUps.value + 1)).ToString();
+
+                    if (EnergyUps.value == EnergyUps.maxValue)
+                    {
+                        EnergyUps.GetComponentInChildren<Text>().gameObject.SetActive(false);
+                    }
                 }
                 break;
             
             case 3 :
-                if ( _playerData.AllPoint >= 100 && EnergyMps.value < EnergyMps.maxValue)
+                if ( _playerData.AllPoint >= 100 * (int)(EnergyMps.value + 1) && EnergyMps.value < EnergyMps.maxValue)
                 {
-                    ShopCost(-100);
+                    ShopCost(-100 * (int)(EnergyMps.value + 1));
 
                     _playerData.EnergyMp += 0.1f;
 
                     EnergyMps.value += 1f;
+
+                    EnergyMps.GetComponentInChildren<Text>().text = (100 * (int)(EnergyMps.value + 1)).ToString();
+
+                    if (EnergyMps.value == EnergyMps.maxValue)
+                    {
+                        EnergyMps.GetComponentInChildren<Text>().gameObject.SetActive(false);
+                    }
                 }
                 break;
             
             case 4 :
-                if ( _playerData.AllPoint >= 300 && KnockDws.value < KnockDws.maxValue)
+                if ( _playerData.AllPoint >= 300 * (int)(KnockDws.value + 1) && KnockDws.value < KnockDws.maxValue)
                 {
-                    ShopCost(-300);
+                    ShopCost(-300 * (int)(KnockDws.value + 1));
 
                     _playerData.KnockDw += 0.1f;
 
                     KnockDws.value += 1f;
+
+                    KnockDws.GetComponentInChildren<Text>().text = (300 * (int)(KnockDws.value + 1)).ToString();
+
+                    if (KnockDws.value == KnockDws.maxValue)
+                    {
+                        KnockDws.GetComponentInChildren<Text>().gameObject.SetActive(false);
+                    }
                 }
                 break;
             
             case 5 :
-                if ( _playerData.AllPoint >= 600 && Totalscores.value < Totalscores.maxValue)
+                if ( _playerData.AllPoint >= 600 * (int)(Totalscores.value + 1) && Totalscores.value < Totalscores.maxValue)
                 {
-                    ShopCost(-600);
+                    ShopCost(-600 * (int)(Totalscores.value + 1));
 
                     _playerData.Totalscore += 0.1f;
 
                     Totalscores.value += 1f;
+
+                    Totalscores.GetComponentInChildren<Text>().text = (600 * (int)(Totalscores.value + 1)).ToString();
+
+                    if (Totalscores.value == Totalscores.maxValue)
+                    {
+                        Totalscores.GetComponentInChildren<Text>().gameObject.SetActive(false);
+                    }
                 }
                 break;
             default:
