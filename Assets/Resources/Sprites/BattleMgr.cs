@@ -103,8 +103,14 @@ public class BattleMgr : MonoBehaviour
 
     public GameObject NoErrorPNG;
 
+    private bool BossSTUN;
+
+    public AudieMusic audieMusic;
+
     void Start()
     {
+        audieMusic = FindObjectOfType<AudieMusic>();
+
         rougeMgr = FindObjectOfType<RougeMgr>();
         
         senceSystem = FindObjectOfType<SenceSystem>();
@@ -162,7 +168,7 @@ public class BattleMgr : MonoBehaviour
             GetCard();
         }
 
-        BossHope.value = Random.Range(0, 100);
+        BossHope.value = 0;
 
 
     }
@@ -171,7 +177,8 @@ public class BattleMgr : MonoBehaviour
         if (senceSystem.CardBackpack.Count > 0)
         {
             GameObject NowCard = Instantiate(Card_deck, Card_deck.transform.parent); //生成卡片
-            
+
+            audieMusic.PlayAudio(0);
             
             if (TargetId != "")
             {
@@ -190,6 +197,8 @@ public class BattleMgr : MonoBehaviour
             }
 
             Button CardButton = NowCard.GetComponent<Button>(); //每張卡牌上的按鈕
+
+            CardButton.onClick.AddListener(() => audieMusic.PlayAudio(0));
 
             CardButton.onClick.AddListener(()=>UseCard(NowCard, NowCard.name, repleseCardId)); //將按鈕綁定事件
             
@@ -214,7 +223,7 @@ public class BattleMgr : MonoBehaviour
 
     public void Washcard()
     {
-        for (int i = 0; i < 21; i++)
+        for (int i = 0; i < 28; i++)
         {
             int RandIndex = Random.Range(0, UsedCard.Count);//檢查牌堆數量
             
@@ -222,7 +231,7 @@ public class BattleMgr : MonoBehaviour
             
             UsedCard.RemoveAt(RandIndex); //刪除指定牌
 
-            
+            CardStack.GetComponentInChildren<Text>().text = "28";
         }
         for (int j = 0; j < 2; j++)
         {
@@ -246,7 +255,7 @@ public class BattleMgr : MonoBehaviour
         Hope.value += Random.Range(10,20) * EnergyMpss;
         
         CheckCard(id.Split("_")[1]);
-        
+
         judgeSystem();
         
         
@@ -319,13 +328,14 @@ public class BattleMgr : MonoBehaviour
         await Task.Delay(1000);//等待兩秒
 
         result.gameObject.SetActive(false);
-        
-        BossHope.value = Random.Range(0, 100);
+
+        if (!BossSTUN) BossHope.value += Random.Range(5, 25);
 
         for (int i = 0; i < 2; i++) //抽牌
         {
             GetCard();
             
+
             if (HandCardId.Count >=5)
             {
                 break;
@@ -577,6 +587,13 @@ public class BattleMgr : MonoBehaviour
     public void CheckCard(string id)
     {
 
+        string[] PlayerDEF = { "08", "11", "12", "14", "23", "24" };
+
+        if (PlayerDEF.ToList<string>().Contains(id))
+        {
+            animeMgr.PlayerAnime("PlayerDFE");
+        }
+
         switch (id)
             {
                 case "09"://替換
@@ -653,7 +670,7 @@ public class BattleMgr : MonoBehaviour
         int WinOrLose = 2; //1是勝利2是平手0是敗
         string PlayerType = PlayrCardId.Split("_")[0]; //玩家的牌分類 
 
-        if (Hope.value > BossHope.value)
+        if (Hope.value > BossHope.value || BossSTUN)
         {
             result.text = "";
                 
@@ -875,10 +892,12 @@ public class BattleMgr : MonoBehaviour
     
     public async void BossGetDamage(int value, bool isAnger) //敵人受傷
     {
+
         animeMgr.PlayerAnime("PlayerATK");
 
         if (isAnger)
         {
+            
             if (BoossAnger.value > 0)
             {
                 animeMgr.BossAnimeter.SetTrigger("BossHit");
@@ -886,81 +905,88 @@ public class BattleMgr : MonoBehaviour
                 Hope.value = 0; 
 
                 result.text = "命中";
+
+                if(!BossSTUN)BossHope.value += 10 ;
             }
             else
             {
                 result.text = "無效";
 
                 animeMgr.BossAnimeter.SetTrigger("BossDEF");
+
             }
             BoossAnger.value -= value;
         }
         else
         {
-            if (BoossAnger.value <=0)
+
+            if (BossSTUN)
             {
-                if (BoossHealth.value > 0)
-                {
-                    animeMgr.BossAnimeter.SetTrigger("BossHit");
+                BoossAnger.value = BoossAnger.maxValue;
 
-                    Hope.value = 0;
+                BossSTUN = false;
 
-                    result.text = "命中";
-                }
-                BoossHealth.value -= value;
+                animeMgr.BossAnimeter.SetBool("BossSTUN", false);
+
+
             }
-            else
-            {
-                result.text = "無效";
 
-                animeMgr.BossAnimeter.SetTrigger("BossDEF");
-            }
+            animeMgr.BossAnimeter.SetTrigger("BossHit");
+
+            Hope.value = 0;
+
+            result.text = "命中";
+
+            if (!BossSTUN) BossHope.value += 10;
+
+            BoossHealth.value -= value;
         }
+
+        if (BoossAnger.value == 0)
+        {
+            BossSTUN = true;
+
+            animeMgr.BossAnimeter.SetBool("BossSTUN", true);
+        }
+
         
+        if (EffectAndCount["cheer"] >= 1)
+        {
+            BoossHealth.value -= 20;
+
+            result.text += "觸發自我打氣";
+
+        }
+
         if (BoossHealth.value == 0)
         {
             PlayerWinEnd();
         }
-        if (EffectAndCount["cheer"] >= 1)
-        {
-            if (BoossAnger.value <= 0)
-            {
-                if (BoossHealth.value > 0)
-                {
-                    BoossHealth.value -= 20;
-                }
-            }
-            else
-            {
-                result.text = "無效";
-
-                animeMgr.BossAnimeter.SetTrigger("BossDEF");
-            }
-
-            result.text += "觸發自我打氣";
-
-            if (BoossHealth.value == 0)
-            {
-                PlayerWinEnd();
-            }
-
-        }
 
         result.gameObject.SetActive(true);
 
-        await Task.Delay(1000);//等待兩秒
+        await Task.Delay(1000);//等待1秒
 
         result.gameObject.SetActive(false);
     } 
 
-public async void PlayerWinEnd() //玩家獲勝
+    public async void PlayerWinEnd() //玩家獲勝
     {
+
+        
+
         NowEnd = true;
         
         point += 1; //擊倒值+1
 
-        showpoint.text = $"分數:{point}"; //同步顯示
-            
+        //showpoint.text = $"分數:{point}"; //同步顯示
+
+        BossSTUN = false;
+
+        animeMgr.BossAnimeter.SetBool("BossSTUN", false);
+
+        await Task.Delay(750);
+
         animeMgr.EnemyDie();
 
         await Task.Delay(1000); //因為無盡模式 要再次呼叫敵人
@@ -990,10 +1016,14 @@ public async void PlayerWinEnd() //玩家獲勝
         BoossHealth.value = BoossHealth.maxValue; //存在植滿血
 
         playerseves.Seve(data); //使用紀錄函數
-        
+
         if (senceSystem.state != "free")
         {
+            animeMgr.PlayerAnimeter.SetBool("PlayerMOVE", true);
+
             animeMgr.BackGroundMove();
+
+            await Task.Delay(100);
         }
         
         await Task.Delay(1000);
@@ -1001,11 +1031,17 @@ public async void PlayerWinEnd() //玩家獲勝
         if (senceSystem.state != "free")
         {
             rougeMgr.NewRound();
+
+            audieMusic.PlayAudio(0);
         }
-        
-        
+
+        Hope.value = 0;
+
+        BossHope.value = 0;
         
         NowEnd = false;
+
+        animeMgr.PlayerAnimeter.SetBool("PlayerMOVE", false);
     }
 
     public void LoseGameEvent() //遊戲結束 失敗
@@ -1036,11 +1072,49 @@ public async void PlayerWinEnd() //玩家獲勝
     public void BossChooseCard(string BossType = "")
     {
         
+        
+
         if (BossType == "")
         {
             string[] AllEnemyTag = new string[] { "defense", "damage", "scare" ,"enhance"};
 
-            EnemyCardId = AllEnemyTag[Random.Range(0, AllEnemyTag.Length)];
+            int rng = Random.Range(0, 100);
+
+            if (BoossHealth.value < BoossHealth.maxValue && rng <= 10)
+            {
+                EnemyCardId = AllEnemyTag[3];
+            }
+            if (BossHope.value < 50)
+            {
+
+                if (rng <= 50)
+                {
+                    EnemyCardId = AllEnemyTag[0];
+                }
+                else if (rng > 50 || rng <= 80)
+                {
+                    EnemyCardId = AllEnemyTag[2];
+                }
+                else
+                {
+                    EnemyCardId = AllEnemyTag[1];
+                }
+            }
+            else
+            {
+                if (rng <= 25)
+                {
+                    EnemyCardId = AllEnemyTag[0];
+                }
+                else if (rng > 25 || rng <= 60)
+                {
+                    EnemyCardId = AllEnemyTag[2];
+                }
+                else
+                {
+                    EnemyCardId = AllEnemyTag[1];
+                }
+            }
         }
         else
         {
@@ -1057,12 +1131,16 @@ public async void PlayerWinEnd() //玩家獲勝
         }
         else if(EnemyCardId == "defense")
         {
-            animeMgr.BossAnimeter.SetTrigger("BossDEFBUFF");
+            animeMgr.BossAnimeter.SetTrigger("BossDEF");
         }
         else if (EnemyCardId == "enhance")
         {
             animeMgr.BossAnimeter.SetTrigger("BossBUFF");
+
         }
+
+        BossHope.value = 0;
+
     }
 
     public void BackTitle()
@@ -1108,7 +1186,7 @@ public async void PlayerWinEnd() //玩家獲勝
             }
         }
 
-        /*if (Input.GetKeyDown(KeyCode.K)) //必殺按鍵
+        if (Input.GetKeyDown(KeyCode.K)) //必殺按鍵
         {
             BossGetDamage(100,true);
             
@@ -1120,6 +1198,6 @@ public async void PlayerWinEnd() //玩家獲勝
             PlayerDamage(1000);
 
             PlayerDamage(1000);
-        }*/
+        }
     }
 }

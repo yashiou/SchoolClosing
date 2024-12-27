@@ -18,8 +18,12 @@ public class ShowHandCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     public string CardName; //卡牌名稱
 
     public string CardEffect; //卡牌效果
+
+    public AudieMusic audieMusic;
     void Start()
     {
+        audieMusic = FindObjectOfType<AudieMusic>();
+
         battleMgr = FindObjectOfType<BattleMgr>();
 
         reetTransform = gameObject.GetComponent<RectTransform>();
@@ -34,6 +38,8 @@ public class ShowHandCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     }
     public void OnPointerEnter(PointerEventData eventData)
     {
+        audieMusic.PlayAudio(0);
+
         reetTransform.anchoredPosition += Vector2.up * offset;
         
         //將大圖片改成小圖

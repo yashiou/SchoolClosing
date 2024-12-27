@@ -34,10 +34,12 @@ public class AnimeMgr : MonoBehaviour
 
     public async void EnemyDie()
     {
-        NowEnemy.GetComponent<Animator>().SetTrigger("out");
+        NowEnemy.GetComponent<Animator>().SetBool("out", true);
 
         await Task.Delay(1000);
-        
+
+        NowEnemy.GetComponent<Animator>().SetBool("out", false);
+
         NowEnemy.SetActive(false);
     }
 

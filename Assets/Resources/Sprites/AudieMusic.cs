@@ -5,7 +5,9 @@ using UnityEngine;
 
 public class AudieMusic : MonoBehaviour
 {
-    public AudioSource audioSource; //音樂撥放器
+    public AudioSource MusicSource; //音樂撥放器
+
+    public AudioSource audioSource; //音效
 
     public float AudioSoundValue, MusicSoundValue,AllSoundValue; //兩個音量調整
     
@@ -23,7 +25,6 @@ public class AudieMusic : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-         audioSource = GetComponent<AudioSource>();
 
          AudioSoundValue = 1.0f;
          
@@ -34,20 +35,27 @@ public class AudieMusic : MonoBehaviour
 
     public void PlayerMusic(int index) //指定撥放音樂
     {
-        audioSource.clip = Music[index];
-        
-        audioSource.Play(); 
+        MusicSource.clip = Music[index];
+
+        MusicSource.Play(); 
     }
 
     public void StopAllSound()
     {
-        audioSource.Stop(); //停止所有音樂
+        MusicSource.Stop(); //停止所有音樂
     }
-    
+
+
+    public void PlayAudio(int Index)
+    {
+        audioSource.PlayOneShot(Audie[Index]);
+    }
+
     // Update is called once per frame
     void Update()
     {
-        audioSource.volume = MusicSoundValue * AllSoundValue;
-        
+        MusicSource.volume = MusicSoundValue * AllSoundValue;
+
+        audioSource.volume = AudioSoundValue * AllSoundValue;
     }
 }

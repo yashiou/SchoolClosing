@@ -32,8 +32,12 @@ public class RougeMgr : MonoBehaviour
 
     [SerializeField]
     public AnimeMgr animeMgr;
+
+    public AudieMusic audieMusic;
     void Start()
     {
+        audieMusic = FindObjectOfType<AudieMusic>();
+
         senceSystem = FindAnyObjectByType<SenceSystem>();
 
         List<string> TypeCard = new List<string>();
@@ -66,6 +70,8 @@ public class RougeMgr : MonoBehaviour
         foreach (string card in AllCardTypes)
         {
             string RandomCard = categorized[card][Random.Range(0, categorized[card].Count)]; //找出分類隨機抽取
+
+            audieMusic.PlayAudio(0);
 
             GameObject newCard = Instantiate(Chose_Prefb, Chose_Prefb.transform.parent); //生成卡牌
             
@@ -124,16 +130,16 @@ public class RougeMgr : MonoBehaviour
             
             ClearList.Add(Card);
 
-            Text Cardtext = Card.GetComponentInChildren<Text>();
+            Text Cardtext = Card.transform.GetChild(0).GetComponent<Text>();
 
-            Text CardEffect = Card.GetComponentInChildren<Text>();
+            Text CardEffect = Card.transform.GetChild(1).GetComponent<Text>();
             
             //根據ID找到所有符合條件的物件TextData物件 並整理成數據 交給.ToList()轉成陣列
             List<TextData> textData = senceSystem.CardText.TextFormat.Where(x => x.id == Card.name.Split("_")[1] ).ToList();
             
             Cardtext.text = textData[0].Name;//給予名字
 
-            Cardtext.text = textData[0].Effect; //給予效果
+            CardEffect.text = textData[0].Effect; //給予效果
             
             Card_button.onClick.AddListener(() => ChangeCard(Card.name));
 
