@@ -19,10 +19,33 @@ public class SettingMgr : MonoBehaviour
     
     [SerializeField] 
     private Slider AllSoundSlider;
-    
+
+    private Playerseves playerseves;
+
+    private PlayerData playerData;
+
     void Start()
     {
+        playerseves = FindAnyObjectByType<Playerseves>();
+
+        playerData = playerseves.Load();
+
         audieMusic = FindObjectOfType<AudieMusic>();
+
+        if (playerData != null)
+        {
+            MusicSlider.value = playerData.MusicSoundValue;
+
+            AudioSlider.value = playerData.AudioSoundValue;
+
+            AllSoundSlider.value = playerData.AllSoundValue;
+
+            MusicSoundChange();
+
+            AllSoundChange();
+
+            AudioSoundChange();
+        }
     }
     
     void Update()
@@ -60,5 +83,16 @@ public class SettingMgr : MonoBehaviour
     {
         audieMusic.AudioSoundValue = AudioSlider.value;
 
+    }
+
+    public void SettingEnd()
+    {
+        playerData.AllSoundValue = AllSoundSlider.value;
+        
+        playerData.MusicSoundValue = MusicSlider.value;
+
+        playerData.AudioSoundValue = AudioSlider.value;
+
+        playerseves.Seve(playerData);
     }
 }

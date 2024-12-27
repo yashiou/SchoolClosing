@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
 
 
@@ -15,6 +16,10 @@ public class AnimeMgr : MonoBehaviour
 
     [SerializeField] 
     public GameObject BackGround;
+
+    public Animator PlayerAnimeter;
+
+    public Animator BossAnimeter;
 
     public void CallNextEnemys()
     {
@@ -39,6 +44,16 @@ public class AnimeMgr : MonoBehaviour
     public void BackGroundMove()
     {
         BackGround.GetComponent<Animator>().SetTrigger("MOVE");
+    }
+
+    public void PlayerAnime(string move)
+    {
+        PlayerAnimeter.SetTrigger(move);
+    }
+
+    public void BossATK()
+    {
+        BossAnimeter.gameObject.transform.GetChild(0).GetComponent<Animator>().SetTrigger("BossATK");
     }
     void Start()
     {
