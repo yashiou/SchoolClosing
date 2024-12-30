@@ -107,6 +107,7 @@ public class BattleMgr : MonoBehaviour
 
     public AudieMusic audieMusic;
 
+    public MATMgr matmgr;
     void Start()
     {
         audieMusic = FindObjectOfType<AudieMusic>();
@@ -973,8 +974,6 @@ public class BattleMgr : MonoBehaviour
     public async void PlayerWinEnd() //玩家獲勝
     {
 
-        
-
         NowEnd = true;
         
         point += 1; //擊倒值+1
@@ -1033,6 +1032,11 @@ public class BattleMgr : MonoBehaviour
             rougeMgr.NewRound();
 
             audieMusic.PlayAudio(0);
+
+            if (!data.LookRougeMAT)
+            {  
+                matmgr.RougeMAT(); 
+            }
         }
 
         Hope.value = 0;
@@ -1162,7 +1166,6 @@ public class BattleMgr : MonoBehaviour
         else if (n == 2)
         {
             BossGetDamage(5, false);
-            BossGetDamage(15, true);
         }
         else if (n == 3)
         {
@@ -1186,7 +1189,7 @@ public class BattleMgr : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.K)) //必殺按鍵
+        /*if (Input.GetKeyDown(KeyCode.K)) //必殺按鍵
         {
             BossGetDamage(100,true);
             
@@ -1198,6 +1201,6 @@ public class BattleMgr : MonoBehaviour
             PlayerDamage(1000);
 
             PlayerDamage(1000);
-        }
+        }*/
     }
 }

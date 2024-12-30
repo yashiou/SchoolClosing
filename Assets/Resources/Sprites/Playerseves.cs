@@ -37,6 +37,9 @@ public class PlayerData
         EnergyMp,
         KnockDw,
         Totalscore;
+    public bool LookMAT;
+
+    public bool LookRougeMAT;
 }
 public class Playerseves : MonoBehaviour
 {
@@ -57,7 +60,15 @@ public class Playerseves : MonoBehaviour
     
         if (Load() == null)
         {
-            Seve(new PlayerData());
+            PlayerData data = new PlayerData();
+
+            data.AudioSoundValue = 1.0f;
+
+            data.MusicSoundValue = 1.0f;
+
+            data.AllSoundValue = 0.5f;
+
+            Seve(data);
         }
     }
 

@@ -26,11 +26,7 @@ public class AudieMusic : MonoBehaviour
     void Start()
     {
 
-         AudioSoundValue = 1.0f;
          
-         MusicSoundValue = 1.0f;
-         
-         AllSoundValue = 0.5f;
     }
 
     public void PlayerMusic(int index) //指定撥放音樂
