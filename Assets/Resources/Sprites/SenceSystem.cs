@@ -31,7 +31,9 @@ public class SenceSystem : MonoBehaviour //儲存牌組數據
 
     public string state;
 
-    
+    public Animator Change;
+
+    public Text ChangeTXT;
     private void Awake()
     {
         DontDestroyOnLoad(gameObject);
@@ -160,6 +162,13 @@ public class SenceSystem : MonoBehaviour //儲存牌組數據
         audieMusic = FindObjectOfType<AudieMusic>();
         
         
+    }
+
+    public void Changechg() 
+    {
+        Change.SetTrigger("IN");
+
+        ChangeTXT.text = ChangeTXT.text.Replace("0000", UnityEngine.Random.Range(1000, 9999).ToString());
     }
 
     // Update is called once per frame

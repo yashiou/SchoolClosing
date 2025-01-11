@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -72,7 +73,7 @@ public class TitleMgr : MonoBehaviour
         playerseves.Loading();
     }
 
-    public void Endless()
+    public async void Endless()
     {
         for (int i = 0; i < 7; i++)
         {
@@ -85,6 +86,10 @@ public class TitleMgr : MonoBehaviour
             senceSystem.CardBackpack.Add("inspire_23");
 
         }
+
+        senceSystem.Changechg();
+
+        await Task.Delay(2000);
 
         InToGame("S1");
     }

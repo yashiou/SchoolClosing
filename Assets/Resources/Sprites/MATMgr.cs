@@ -49,9 +49,9 @@ public class MATMgr : MonoBehaviour
 
         MAT.rectTransform.sizeDelta = new Vector2(1282, 362);
 
-        MATtext.rectTransform.parent.localPosition = new Vector2(0, 230);
+        MATtext.rectTransform.parent.localPosition = new Vector2(0, 250);
 
-        MATtext.rectTransform.parent.GetComponent<RectTransform>().sizeDelta = new Vector2(600, 60);
+        MATtext.rectTransform.parent.GetComponent<RectTransform>().sizeDelta = new Vector2(600, 210);
 
         MATtext.text = "這是你的手牌";
 
@@ -61,9 +61,9 @@ public class MATMgr : MonoBehaviour
 
         MAT.rectTransform.sizeDelta = new Vector2(1136, 220);
 
-        MATtext.rectTransform.parent.localPosition = new Vector2(0, -158);
+        MATtext.rectTransform.parent.localPosition = new Vector2(0, -220);
 
-        MATtext.rectTransform.parent.GetComponent<RectTransform>().sizeDelta = new Vector2(600, 60);
+        MATtext.rectTransform.parent.GetComponent<RectTransform>().sizeDelta = new Vector2(600, 210);
 
         MATtext.text = "這是敵人的血條 上面為怨氣值";
 
@@ -85,9 +85,9 @@ public class MATMgr : MonoBehaviour
 
         MAT.rectTransform.sizeDelta = new Vector2(514, 94);
 
-        MATtext.rectTransform.parent.localPosition = new Vector2(42, 95);
+        MATtext.rectTransform.parent.localPosition = new Vector2(42, 115);
 
-        MATtext.rectTransform.parent.GetComponent<RectTransform>().sizeDelta = new Vector2(600, 60);
+        MATtext.rectTransform.parent.GetComponent<RectTransform>().sizeDelta = new Vector2(600, 210);
 
         MATtext.text = "這是你的理智值";
 
@@ -101,9 +101,9 @@ public class MATMgr : MonoBehaviour
 
         MAT.rectTransform.sizeDelta = new Vector2(306, 247);
 
-        MATtext.rectTransform.parent.localPosition = new Vector2(326, 100);
+        MATtext.rectTransform.parent.localPosition = new Vector2(326, 120);
 
-        MATtext.rectTransform.parent.GetComponent<RectTransform>().sizeDelta = new Vector2(300, 45);
+        MATtext.rectTransform.parent.GetComponent<RectTransform>().sizeDelta = new Vector2(350, 195);
 
         MATtext.text = "此為你的總牌數";
 
@@ -113,13 +113,17 @@ public class MATMgr : MonoBehaviour
 
         MAT.rectTransform.sizeDelta = new Vector2(65, 379);
 
-        MATtext.rectTransform.parent.localPosition = new Vector2(247, 259);
+        MATtext.rectTransform.parent.localPosition = new Vector2(247, 279);
 
-        MATtext.rectTransform.parent.GetComponent<RectTransform>().sizeDelta = new Vector2(480, 60);
+        MATtext.rectTransform.parent.GetComponent<RectTransform>().sizeDelta = new Vector2(650, 210);
 
         MATtext.text = "這是你的希望值";
 
         await WaitClick();
+
+        MATtext.rectTransform.parent.localPosition = new Vector2(247, 279);
+
+        MATtext.rectTransform.parent.GetComponent<RectTransform>().sizeDelta = new Vector2(650, 210);
 
         MATtext.text = "希望值會隨著回合上漲";
 
@@ -133,17 +137,17 @@ public class MATMgr : MonoBehaviour
 
         await WaitClick();
 
-        MATtext.rectTransform.parent.localPosition = new Vector2(287, 140);
+        MATtext.rectTransform.parent.localPosition = new Vector2(360, 160);
 
-        MATtext.rectTransform.parent.GetComponent<RectTransform>().sizeDelta = new Vector2(480, 95);
+        MATtext.rectTransform.parent.GetComponent<RectTransform>().sizeDelta = new Vector2(700, 175);
 
-        MATtext.text = "只有當希望值高於敵人怒氣值時才能成功攻擊";
+        MATtext.text = "只有當希望值高於敵人怒氣值時\n才能成功攻擊";
         
         await WaitClick();
 
-        MATtext.rectTransform.parent.localPosition = new Vector2(247, 259);
+        MATtext.rectTransform.parent.localPosition = new Vector2(247, 279);
 
-        MATtext.rectTransform.parent.GetComponent<RectTransform>().sizeDelta = new Vector2(480, 60);
+        MATtext.rectTransform.parent.GetComponent<RectTransform>().sizeDelta = new Vector2(480, 210);
 
         MATtext.text = "攻擊成功時希望值會歸零";
 
@@ -153,9 +157,9 @@ public class MATMgr : MonoBehaviour
 
         MAT.rectTransform.sizeDelta = new Vector2(150, 150);
 
-        MATtext.rectTransform.parent.localPosition = new Vector2(351, 0);
+        MATtext.rectTransform.parent.localPosition = new Vector2(351, 20);
 
-        MATtext.rectTransform.parent.GetComponent<RectTransform>().sizeDelta = new Vector2(497, 45);
+        MATtext.rectTransform.parent.GetComponent<RectTransform>().sizeDelta = new Vector2(530, 195);
 
         MATtext.text = "你可以在設定再次觀看教學";
 
@@ -182,21 +186,21 @@ public class MATMgr : MonoBehaviour
 
         MAT.rectTransform.sizeDelta = new Vector2(1362, 480);
 
-        MATtext.rectTransform.parent.localPosition = new Vector2(0, -280);
+        MATtext.rectTransform.parent.localPosition = new Vector2(0, -350);
 
-        MATtext.rectTransform.parent.GetComponent<RectTransform>().sizeDelta = new Vector2(653, 45);
+        MATtext.rectTransform.parent.GetComponent<RectTransform>().sizeDelta = new Vector2(820, 195);
 
         MATtext.text = "你可以選擇一張你想要的牌進行替換";
 
         await WaitClick();
 
-        MATtext.rectTransform.parent.GetComponent<RectTransform>().sizeDelta = new Vector2(252, 45);
+        MATtext.rectTransform.parent.GetComponent<RectTransform>().sizeDelta = new Vector2(310, 195);
 
         MATtext.text = "共有四種卡牌";
 
         await WaitClick();
 
-        MATtext.rectTransform.parent.GetComponent<RectTransform>().sizeDelta = new Vector2(665, 45);
+        MATtext.rectTransform.parent.GetComponent<RectTransform>().sizeDelta = new Vector2(820, 195);
 
         MATtext.text = "四種卡牌只能替換相對應類型的卡牌";
 
@@ -206,9 +210,9 @@ public class MATMgr : MonoBehaviour
 
         MAT.rectTransform.sizeDelta = new Vector2(150, 150);
 
-        MATtext.rectTransform.parent.localPosition = new Vector2(-350, 0);
+        MATtext.rectTransform.parent.localPosition = new Vector2(-350, 20);
 
-        MATtext.rectTransform.parent.GetComponent<RectTransform>().sizeDelta = new Vector2(502, 45);
+        MATtext.rectTransform.parent.GetComponent<RectTransform>().sizeDelta = new Vector2(610, 195);
 
         MATtext.text = "你可以點擊此再次觀看教學";
 

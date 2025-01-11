@@ -22,6 +22,11 @@ public class ShopMar : MonoBehaviour
         KnockDws,
         Totalscores;
 
+    public List<GameObject> NPCS = new List<GameObject>();
+
+    private int nowpage;
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -207,6 +212,18 @@ public class ShopMar : MonoBehaviour
                 break;
         }
         _playerseves.Seve(_playerData);
+    }
+
+    public void NPCchange(int pag)
+    {
+        if (NPCS.Count > nowpage + pag && nowpage + pag > -1)
+        {
+            NPCS[nowpage].SetActive(false);
+
+            nowpage += pag;
+
+            NPCS[nowpage].SetActive(true);
+        }
     }
     private void ShopCost(int coint)
     {

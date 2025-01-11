@@ -1189,7 +1189,7 @@ public class BattleMgr : MonoBehaviour
             }
         }
 
-        /*if (Input.GetKeyDown(KeyCode.K)) //必殺按鍵
+        if (Input.GetKeyDown(KeyCode.K)) //必殺按鍵
         {
             BossGetDamage(100,true);
             
@@ -1201,6 +1201,6 @@ public class BattleMgr : MonoBehaviour
             PlayerDamage(1000);
 
             PlayerDamage(1000);
-        }*/
+        }
     }
 }
